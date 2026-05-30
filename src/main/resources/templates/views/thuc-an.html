@@ -1,0 +1,203 @@
+<main class="container my-5" th:fragment="main">
+    <div th:replace="~{fragments/booking-steps :: bookingSteps('food')}"></div>
+
+    <div th:if="${checkout == null}"
+         class="max-w-3xl mx-auto px-4 py-16 text-center text-gray-500">
+        <i class="fa-solid fa-chair text-3xl mb-4 text-orange-400"></i>
+        <p class="mb-4">Vui lòng chọn ghế trước khi chọn thức ăn.</p>
+        <a th:href="@{/}" class="text-orange-500 font-semibold hover:underline">Về trang chủ</a>
+    </div>
+
+    <main th:if="${checkout != null}"
+          th:with="posterUrl=${checkout.posterUrl != null and !#strings.isEmpty(checkout.posterUrl) ? checkout.posterUrl : defaultPoster}"
+          class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div id="food-picker" class="lg:col-span-2 bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+            <h1 class="text-base font-semibold text-gray-700 mb-6 pb-2 border-b border-gray-100">Chọn Combo / Sản phẩm</h1>
+
+            <div th:if="${#lists.isEmpty(products)}"
+                 class="text-center py-12 text-gray-400 text-sm">
+                Chưa có sản phẩm.
+            </div>
+
+            <div th:unless="${#lists.isEmpty(products)}"
+                 class="space-y-5 max-h-[650px] overflow-y-auto product-scrollbar pr-2">
+
+                <div th:each="product : ${products}"
+                     class="flex items-start space-x-4 p-3 rounded-lg hover:bg-gray-50 transition">
+                    <div class="w-24 h-24 bg-[#fff7ed] rounded-lg flex items-center justify-center flex-shrink-0 border border-orange-100 overflow-hidden">
+                        <img th:src="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl) ? product.imageUrl : defaultProductImage}"
+                             th:alt="${product.productName}"
+                             class="w-20 h-20 object-contain mix-blend-multiply">
+                    </div>
+                    <div class="flex-grow flex flex-col justify-between min-h-24">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-semibold text-gray-800" th:text="${product.productName}">Combo</h3>
+                                <span th:if="${product.typeLabel != null}"
+                                      class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-medium"
+                                      th:text="${product.typeLabel}">Combo</span>
+                            </div>
+                            <p th:if="${product.description != null}"
+                               class="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed"
+                               th:text="${product.description}">Mô tả</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-sm font-semibold text-gray-700"
+                                  th:text="'Giá: ' + ${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">Giá</span>
+                            <div class="flex items-center space-x-3 border border-gray-200 rounded-md px-2 py-1 bg-white">
+                                <button type="button"
+                                        class="product-qty-btn text-gray-400 hover:text-gray-600 font-medium px-1 text-sm"
+                                        th:data-product-id="${product.productId}"
+                                        th:data-price="${product.price}"
+                                        data-action="dec">-</button>
+                                <span class="text-xs font-semibold w-4 text-center"
+                                      th:data-qty-for="${product.productId}">0</span>
+                                <button type="button"
+                                        class="product-qty-btn text-gray-400 hover:text-gray-600 font-medium px-1 text-sm"
+                                        th:data-product-id="${product.productId}"
+                                        th:data-price="${product.price}"
+                                        data-action="inc">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="flex flex-col space-y-4 h-fit">
+
+            <div th:replace="~{fragments/booking-hold-timer :: bookingHoldTimer}"></div>
+
+            <div class="bg-white rounded-lg p-5 shadow-sm border border-gray-100 flex flex-col justify-between border-t-4 border-t-orange-500">
+
+                <div class="flex space-x-4 mb-6">
+                    <div class="w-24 h-36 bg-gray-200 rounded overflow-hidden flex-shrink-0 relative shadow-inner">
+                        <img th:src="${posterUrl}" th:alt="${checkout.movieTitle}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex flex-col justify-start space-y-2">
+                        <h2 class="text-base font-bold text-gray-800 leading-tight" th:text="${checkout.movieTitle}">Tên phim</h2>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-gray-500 font-medium" th:text="${checkout.formatType}">2D</span>
+                            <span th:if="${checkout.rating != null}"
+                                  th:text="${checkout.rating}"
+                                  th:class="${checkout.ratingBadgeClass + ' text-white text-[10px] font-bold px-1.5 py-0.5 rounded'}">T16</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3 text-xs text-gray-600 border-b border-dashed border-gray-200 pb-5 mb-5">
+                    <div class="flex justify-between">
+                        <span class="font-semibold text-gray-800" th:text="${checkout.cinemaName}">Rạp</span>
+                        <span class="text-gray-400 font-medium" th:text="${checkout.roomName}">Phòng</span>
+                    </div>
+                    <div>
+                        <span>Suất: <strong class="text-gray-800" th:text="${#temporals.format(checkout.startTime, 'HH:mm')}">15:15</strong>
+                        - <span th:text="${#temporals.format(checkout.startTime, 'EEEE, dd/MM/yyyy', new java.util.Locale('vi', 'VN'))}">Ngày</span></span>
+                    </div>
+                    <div th:each="seat : ${checkout.selectedSeats}"
+                         class="pt-1 flex justify-between text-gray-700">
+                        <span class="text-gray-400">Ghế: <strong th:text="${seat.seatLabel}">A1</strong></span>
+                        <span class="font-semibold text-gray-800"
+                              th:text="${#numbers.formatDecimal(seat.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">75.000 đ</span>
+                    </div>
+                    <div class="pt-2 flex justify-between text-gray-700 border-t border-dashed border-gray-100">
+                        <span>Tiền vé</span>
+                        <span class="font-semibold"
+                              th:text="${#numbers.formatDecimal(checkout.seatTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">75.000 đ</span>
+                    </div>
+                    <div class="flex justify-between text-gray-700">
+                        <span>Thức ăn / Combo</span>
+                        <span id="food-product-total" class="font-semibold">0 đ</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-sm font-semibold text-gray-700">Tổng cộng</span>
+                    <span id="food-total"
+                          class="text-lg font-bold text-orange-500"
+                          th:text="${#numbers.formatDecimal(checkout.seatTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">75.000 đ</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <a th:href="@{/dat-ve(showtimeId=${checkout.showtimeId})}"
+                       class="col-span-1 py-2.5 border border-orange-500 text-orange-500 rounded font-medium text-center hover:bg-orange-50 transition text-xs">Quay lại</a>
+                    <button type="button" id="food-continue"
+                            th:attr="data-continue-url=@{/thanh-toan(showtimeId=${checkout.showtimeId}, showSeatIds=${showSeatIds})}"
+                            class="col-span-2 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded font-medium text-center transition shadow-md text-xs">
+                        Tiếp tục
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <div th:if="${checkout != null}" th:replace="~{views/xac-nhan-tuoi :: ageConfirmationModal}"></div>
+
+    <script th:if="${checkout != null}" th:src="@{/js/booking-hold-timer.js}"></script>
+    <script th:if="${checkout != null}" th:src="@{/js/food-picker.js}"></script>
+    <script th:if="${checkout != null}" th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const showtimeId = /*[[${checkout.showtimeId}]]*/ 0;
+            const showSeatIds = /*[[${showSeatIds}]]*/ '';
+
+            BookingHoldTimer.init({
+                showtimeId: showtimeId,
+                showSeatIds: showSeatIds,
+                allowStart: true,
+                onExpired: function () {
+                    const btn = document.getElementById('food-continue');
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                }
+            });
+
+            FoodPicker.init(
+                /*[[${checkout.seatTotal}]]*/ 0,
+                /*[[${checkout.showtimeId}]]*/ 0,
+                /*[[${showSeatIds}]]*/ ''
+            );
+
+            const continueBtn = document.getElementById('food-continue');
+            const modal = document.getElementById('ageConfirmationModal');
+            const declineBtn = document.getElementById('ageDeclineBtn');
+            const confirmBtn = document.getElementById('ageConfirmBtn');
+            const backdrop = document.getElementById('ageModalBackdrop');
+            if (!continueBtn || !modal) return;
+
+            function openAgeModal() {
+                modal.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            }
+
+            function closeAgeModal() {
+                modal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+
+            function getContinueUrl() {
+                return continueBtn.dataset.continueUrl || '';
+            }
+
+            continueBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                openAgeModal();
+            });
+            if (declineBtn) declineBtn.addEventListener('click', closeAgeModal);
+            if (backdrop) backdrop.addEventListener('click', closeAgeModal);
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', function () {
+                    const url = getContinueUrl();
+                    if (url) {
+                        window.location.href = url;
+                    }
+                });
+            }
+        });
+    </script>
+</main>

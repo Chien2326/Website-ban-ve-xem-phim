@@ -1,0 +1,124 @@
+<main class="container my-5" th:fragment="main">
+
+    <div th:if="${checkout == null}"
+         class="max-w-3xl mx-auto px-4 py-16 text-center text-gray-500">
+        <p class="mb-2" th:if="${checkoutError != null}" th:text="${checkoutError}">Lỗi</p>
+        <p th:unless="${checkoutError != null}" class="mb-4">Không có thông tin đặt vé.</p>
+        <a th:href="@{/}" class="text-orange-500 font-semibold hover:underline">Về trang chủ</a>
+    </div>
+
+    <div th:if="${checkout != null}"
+         th:with="posterUrl=${checkout.posterUrl != null and !#strings.isEmpty(checkout.posterUrl) ? checkout.posterUrl : defaultPoster}">
+        <div class="filter blur-[1px] select-none pointer-events-none">
+            <div th:replace="~{fragments/booking-steps :: bookingSteps('confirm')}"></div>
+            <main class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white rounded-lg p-6 h-40 border border-gray-200"></div>
+                    <div class="bg-white rounded-lg p-6 h-96 border border-gray-200"></div>
+                </div>
+                <div class="bg-white rounded-lg p-5 border border-gray-200 h-96"></div>
+            </main>
+        </div>
+
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+
+            <div class="bg-white rounded-2xl w-full max-w-[480px] shadow-2xl relative overflow-hidden border border-gray-100 flex flex-col">
+
+                <a th:href="${thanhToanUrl}"
+                   class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition text-xl font-light leading-none"
+                   title="Quay lại">&times;</a>
+
+                <div class="text-center pt-6 pb-4 border-b border-gray-50">
+                    <h2 class="text-sm font-bold text-gray-700 tracking-wider">THÔNG TIN ĐẶT VÉ</h2>
+                </div>
+
+                <div class="p-6 space-y-4">
+
+                    <div class="flex border border-gray-200 rounded-lg p-3 text-sm">
+                        <div class="w-16 font-medium text-gray-400 flex-shrink-0">Phim</div>
+                        <div class="pl-4 space-y-1">
+                            <div class="font-bold text-[#034ea1] text-base" th:text="${checkout.movieTitle}">Tên phim</div>
+                            <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                <span th:text="${checkout.formatType}">2D</span>
+                                <span th:if="${checkout.rating != null}"
+                                      th:text="${checkout.rating}"
+                                      th:class="${checkout.ratingBadgeClass + ' text-white text-[10px] font-bold px-1.5 py-0.5 rounded'}">T16</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex border border-gray-200 rounded-lg p-3 text-sm">
+                        <div class="w-16 font-medium text-gray-400 flex-shrink-0">Rạp</div>
+                        <div class="pl-4 space-y-1">
+                            <div class="font-bold text-gray-800" th:text="${checkout.cinemaName}">Rạp</div>
+                            <div class="text-xs text-gray-600 font-medium">
+                                <span th:text="${#temporals.format(checkout.startTime, 'HH:mm')}">19:45</span>
+                                - <span th:text="${#temporals.format(checkout.startTime, 'EEEE, dd/MM/yyyy', new java.util.Locale('vi', 'VN'))}">Ngày</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex border border-gray-200 rounded-lg p-3 text-sm">
+                        <div class="w-16 font-medium text-gray-400 flex-shrink-0">Phòng</div>
+                        <div class="pl-4 space-y-1 text-xs text-gray-600 font-medium">
+                            <div th:text="${checkout.roomName}">RAP 2</div>
+                            <div>Ghế <strong class="text-gray-800 text-sm font-bold pl-1" th:text="${checkout.seatLabels}">A1</strong></div>
+                            <div th:each="product : ${checkout.selectedProducts}" class="pt-1">
+                                <span th:text="${product.quantity} + 'x ' + ${product.productName}">1x Combo</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${paymentMethodLabel != null}"
+                         class="flex border border-gray-200 rounded-lg p-3 text-sm">
+                        <div class="w-16 font-medium text-gray-400 flex-shrink-0">Thanh toán</div>
+                        <div class="pl-4 font-medium text-gray-800" th:text="${paymentMethodLabel}">MoMo</div>
+                    </div>
+
+                    <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden text-sm">
+                        <div class="w-16 font-medium text-gray-400 flex-shrink-0 pl-3">Tổng</div>
+                        <div class="flex-grow bg-[#034ea1] text-white font-bold text-base py-3 px-4 text-center tracking-wide"
+                             th:text="${#numbers.formatDecimal(checkout.grandTotal, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+                            75.000 VNĐ
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="relative flex items-center justify-center px-6">
+                    <div class="absolute left-0 -ml-3 w-6 h-6 bg-black/60 rounded-full z-10"></div>
+                    <div class="w-full border-t border-dashed border-gray-300"></div>
+                    <div class="absolute right-0 -mr-3 w-6 h-6 bg-black/60 rounded-full z-10"></div>
+                </div>
+
+                <div class="p-6 pt-4 bg-gray-50/50 flex flex-col items-center space-y-4">
+
+                    <label class="flex items-start space-x-3 cursor-pointer group">
+                        <div class="w-8 h-8 bg-emerald-50 rounded-full flex items-center justify-center flex-shrink-0 border border-emerald-200 mt-0.5">
+                            <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944a11.954 11.954 0 007.834 3.056 12.012 12.012 0 01-1.183 5.508 12.01 12.01 0 01-6.184 6.495 12.01 12.01 0 01-6.183-6.495 12.011 12.011 0 01-1.183-5.508zm8.93 2.293a1 1 0 10-1.414-1.414L7 8.586 5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l3-3z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="text-[11px] text-gray-500 leading-normal">
+                            Tôi xác nhận các thông tin đặt vé đã chính xác.
+                            Tôi đồng ý với các <a href="#" class="text-orange-500 font-semibold underline">Điều khoản dịch vụ</a>.
+                        </div>
+                        <input type="checkbox" checked class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500 mt-1 flex-shrink-0 accent-orange-500">
+                    </label>
+
+                    <button type="button" disabled
+                            class="w-full py-3 bg-gray-300 text-white font-semibold rounded-lg text-sm cursor-not-allowed tracking-wide text-center"
+                            title="Chức năng lưu đơn sẽ được bổ sung">
+                        Thanh Toán (demo)
+                    </button>
+
+                    <a th:href="${thanhToanUrl}"
+                       class="text-xs text-orange-500 font-semibold hover:underline">
+                        Quay lại chỉnh sửa
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>

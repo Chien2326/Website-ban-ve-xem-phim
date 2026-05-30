@@ -1,0 +1,20 @@
+<main id="main" class="main" th:fragment="main">
+    <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Phân quyền (Roles)', 'Hệ thống', @{/admin})}"></div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <p class="text-muted small">ADMIN, CUSTOMER, nhân viên bán vé... — giới hạn quyền truy cập module.</p>
+                <table class="table table-striped">
+                    <thead><tr><th>ID</th><th>Tên vai trò</th><th>Mô tả</th></tr></thead>
+                    <tbody>
+                    <tr th:each="r : ${items}">
+                        <td th:text="${r.roleId}">1</td>
+                        <td th:text="${r.roleName}">ADMIN</td>
+                        <td th:text="${r.description}">Mô tả</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>

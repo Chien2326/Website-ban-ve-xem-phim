@@ -1,0 +1,212 @@
+
+<main class="container my-5" th:fragment="main">
+    <section class="relative w-full bg-gray-100 py-2 overflow-hidden flex items-center justify-center">
+        <div
+                class="hidden xl:block w-[12%] h-[380px] opacity-40 transform -translate-x-6 rounded-r-xl overflow-hidden shadow-inner">
+            <img src="https://images.unsplash.com/photo-1608889174639-414d9fde9bfd?q=80&w=400"
+                 class="w-full h-full object-cover" alt="Sub banner left">
+        </div>
+
+        <div
+                class="w-full xl:w-[74%] h-[240px] sm:h-[320px] md:h-[380px] bg-gradient-to-r from-pink-100 to-orange-100 relative rounded-none xl:rounded-2xl shadow-md overflow-hidden mx-1 flex items-center justify-between p-8">
+            <div class="space-y-3 z-10 max-w-md">
+                <span
+                        class="bg-white/80 text-orange-600 font-bold text-xs px-2.5 py-1 rounded-full border border-orange-200 shadow-sm"><i
+                        class="fa-solid fa-bolt mr-1"></i> Mua vé xem phim</span>
+                <h1 class="text-2xl sm:text-4xl font-black text-gray-800 tracking-tight leading-none"><span
+                        class="text-pink-600">MoMoDay</span> hoàn 2% Mỗi Thứ 3-4-5</h1>
+                <p class="text-xs sm:text-sm text-gray-500 font-medium">Khi thanh toán bằng ví điện tử MoMo tại mọi cụm
+                    rạp Galaxy</p>
+                <div class="flex items-center space-x-4 pt-2">
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Đồng tài trợ</span>
+                    <span class="font-extrabold italic text-pink-600 text-xs">momo</span>
+                    <span class="font-bold italic text-blue-700 text-xs">Galaxy</span>
+                </div>
+            </div>
+            <div class="absolute right-4 bottom-0 top-0 w-1/2 hidden md:flex items-center justify-center">
+                <div class="w-64 h-64 bg-pink-500/10 rounded-full blur-3xl absolute"></div>
+                <i class="fa-solid fa-mask-face text-[180px] text-pink-500/20 transform rotate-12"></i>
+            </div>
+        </div>
+
+        <div
+                class="hidden xl:block w-[12%] h-[380px] opacity-40 transform translate-x-6 rounded-l-xl overflow-hidden shadow-inner relative">
+            <div class="absolute inset-0 bg-orange-600 flex items-center justify-center text-white text-2xl font-black">
+                S Pay</div>
+        </div>
+    </section>
+
+    <div class="max-w-5xl mx-auto w-full px-4 -mt-6 relative z-20">
+        <div id="quick-booking"
+             class="bg-white rounded-lg shadow-xl border border-gray-100 p-3 grid grid-cols-2 md:grid-cols-5 gap-2 text-xs font-medium text-gray-500">
+
+            <!-- Bước 1: Chọn phim -->
+            <div class="qb-step relative" data-step="movie">
+                <button type="button" data-trigger="movie"
+                        class="qb-trigger w-full border border-gray-100 rounded p-2.5 bg-gray-50/50 flex items-center justify-between cursor-pointer hover:border-gray-300 transition text-left">
+                    <span class="qb-label truncate">
+                        <span class="text-orange-500 mr-1">1</span>
+                        <span class="qb-label-text">Chọn Phim</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"></i>
+                </button>
+                <div class="qb-panel hidden absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded shadow-xl z-30 max-h-60 overflow-y-auto">
+                    <ul class="py-1 text-gray-700 text-[13px]" data-list="movie"></ul>
+                </div>
+            </div>
+
+            <!-- Bước 2: Chọn rạp (lock) -->
+            <div class="qb-step relative locked" data-step="cinema">
+                <button type="button" data-trigger="cinema"
+                        class="qb-trigger w-full border border-gray-100 rounded p-2.5 bg-gray-50/50 flex items-center justify-between transition text-left">
+                    <span class="qb-label truncate">
+                        <span class="text-orange-500 mr-1">2</span>
+                        <span class="qb-label-text">Chọn Rạp</span>
+                    </span>
+                    <span class="flex items-center gap-1.5 flex-shrink-0">
+                        <i class="fa-solid fa-lock text-[9px] text-gray-300 qb-lock-icon"></i>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+                    </span>
+                </button>
+                <div class="qb-panel hidden absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded shadow-xl z-30 max-h-60 overflow-y-auto">
+                    <ul class="py-1 text-gray-700 text-[13px]" data-list="cinema"></ul>
+                </div>
+            </div>
+
+            <!-- Bước 3: Chọn ngày (lock) -->
+            <div class="qb-step relative locked" data-step="date">
+                <button type="button" data-trigger="date"
+                        class="qb-trigger w-full border border-gray-100 rounded p-2.5 bg-gray-50/50 flex items-center justify-between transition text-left">
+                    <span class="qb-label truncate">
+                        <span class="text-orange-500 mr-1">3</span>
+                        <span class="qb-label-text">Chọn Ngày</span>
+                    </span>
+                    <span class="flex items-center gap-1.5 flex-shrink-0">
+                        <i class="fa-solid fa-lock text-[9px] text-gray-300 qb-lock-icon"></i>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+                    </span>
+                </button>
+                <div class="qb-panel hidden absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded shadow-xl z-30 max-h-60 overflow-y-auto">
+                    <ul class="py-1 text-gray-700 text-[13px]" data-list="date"></ul>
+                </div>
+            </div>
+
+            <!-- Bước 4: Chọn suất (lock) -->
+            <div class="qb-step relative locked" data-step="showtime">
+                <button type="button" data-trigger="showtime"
+                        class="qb-trigger w-full border border-gray-100 rounded p-2.5 bg-gray-50/50 flex items-center justify-between transition text-left">
+                    <span class="qb-label truncate">
+                        <span class="text-orange-500 mr-1">4</span>
+                        <span class="qb-label-text">Chọn Suất</span>
+                    </span>
+                    <span class="flex items-center gap-1.5 flex-shrink-0">
+                        <i class="fa-solid fa-lock text-[9px] text-gray-300 qb-lock-icon"></i>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+                    </span>
+                </button>
+                <div class="qb-panel hidden absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded shadow-xl z-30 max-h-60 overflow-y-auto">
+                    <ul class="py-1 text-gray-700 text-[13px]" data-list="showtime"></ul>
+                </div>
+            </div>
+
+            <a id="qb-submit" href="#"
+               aria-disabled="true"
+               class="col-span-2 md:col-span-1 bg-[#f59e0b] hover:bg-orange-500 text-white font-bold rounded p-2.5 transition shadow text-center uppercase tracking-wider text-xs opacity-50 pointer-events-none cursor-not-allowed">
+                Mua vé nhanh
+            </a>
+        </div>
+    </div>
+
+    <style>
+        #quick-booking .qb-step.locked .qb-trigger {
+            opacity: 0.55;
+            cursor: not-allowed;
+            background-color: #f3f4f6;
+            pointer-events: none;
+        }
+        #quick-booking .qb-step:not(.locked) .qb-lock-icon {
+            display: none;
+        }
+        #quick-booking .qb-step:not(.locked) .qb-trigger {
+            cursor: pointer;
+        }
+        #quick-booking .qb-step:not(.locked) .qb-trigger:hover {
+            border-color: #d1d5db;
+        }
+    </style>
+
+    <script th:src="@{/js/quick-booking.js}"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const movies = [];
+            /*[# th:each="m : ${bookingMovies}"]*/
+            movies.push({
+                movieId: /*[[${m.movieId}]]*/ 0,
+                title: /*[[${m.title}]]*/ ''
+            });
+            /*[/]*/
+
+            const showtimes = [];
+            /*[# th:each="st : ${bookingShowtimes}"]*/
+            showtimes.push({
+                showtimeId: /*[[${st.showtimeId}]]*/ 0,
+                movieId: /*[[${st.movieId}]]*/ 0,
+                cinemaId: /*[[${st.cinemaId}]]*/ 0,
+                cinemaName: /*[[${st.cinemaName}]]*/ '',
+                startTime: /*[[${#temporals.format(st.startTime, "yyyy-MM-dd'T'HH:mm:ss")}]]*/ '',
+                dateKey: /*[[${#temporals.format(st.startTime, "yyyy-MM-dd")}]]*/ '',
+                timeLabel: /*[[${#temporals.format(st.startTime, "HH:mm")}]]*/ '',
+                formatType: /*[[${st.formatType}]]*/ ''
+            });
+            /*[/]*/
+
+            QuickBooking.init(movies, showtimes);
+        });
+    </script>
+
+    <main class="max-w-7xl mx-auto px-4 py-12 w-full flex-grow">
+
+        <div class="flex items-center space-x-6 border-b border-gray-200 pb-3 mb-8 text-sm font-bold text-gray-400">
+            <a th:href="@{/(tab='dang-chieu', regionId=${selectedRegionId})}"
+               th:classappend="${activeTab == 'dang-chieu'} ? 'text-gray-800 border-b-2 border-blue-600 pb-3 -mb-3' : 'cursor-pointer hover:text-gray-600 transition'"
+               class="flex items-center space-x-1.5">
+                <span th:if="${activeTab == 'dang-chieu'}" class="w-1.5 h-4 bg-blue-600 rounded-sm block"></span>
+                <span>Đang chiếu</span>
+            </a>
+            <a th:href="@{/(tab='sap-chieu', regionId=${selectedRegionId})}"
+               th:classappend="${activeTab == 'sap-chieu'} ? 'text-gray-800 border-b-2 border-blue-600 pb-3 -mb-3' : 'cursor-pointer hover:text-gray-600 transition'">
+                Sắp chiếu
+            </a>
+            <a th:href="@{/(tab='imax', regionId=${selectedRegionId})}"
+               th:classappend="${activeTab == 'imax'} ? 'text-gray-800 border-b-2 border-blue-600 pb-3 -mb-3' : 'cursor-pointer hover:text-gray-600 transition'">
+                Phim IMAX
+            </a>
+
+            <div class="relative ml-auto group">
+                <div class="text-xs font-medium text-gray-500 flex items-center cursor-pointer bg-white border border-gray-200 px-2.5 py-1 rounded hover:bg-gray-50">
+                    <i class="fa-solid fa-location-dot text-blue-500 mr-1"></i>
+                    <span th:if="${selectedRegionId == null}">Toàn quốc</span>
+                    <span th:each="r : ${regions}" th:if="${r.regionId == selectedRegionId}" th:text="${r.regionName}">Khu vực</span>
+                    <i class="fa-solid fa-chevron-down text-[9px] ml-1.5"></i>
+                </div>
+                <div class="absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30">
+                    <ul class="py-1 text-gray-700 text-[13px]">
+                        <li>
+                            <a th:href="@{/(tab=${activeTab})}"
+                               class="block px-4 py-2 hover:bg-blue-50 hover:text-blue-600"
+                               th:classappend="${selectedRegionId == null} ? 'font-semibold text-blue-600' : ''">Toàn quốc</a>
+                        </li>
+                        <li th:each="region : ${regions}">
+                            <a th:href="@{/(tab=${activeTab}, regionId=${region.regionId})}"
+                               th:text="${region.regionName}"
+                               th:classappend="${region.regionId == selectedRegionId} ? 'block px-4 py-2 font-semibold text-blue-600 bg-blue-50/60' : 'block px-4 py-2 hover:bg-blue-50 hover:text-blue-600'"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/movie-grid :: movieGrid(${moreMoviesUrl}, true)}"></div>
+
+    </main>
+</main>

@@ -1,0 +1,20 @@
+<div xmlns:th="https://www.thymeleaf.org" th:fragment="bookingSteps(activeStep)"
+     class="bg-white border-b border-gray-200 py-4 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 flex justify-center items-center space-x-4 md:space-x-12 text-xs md:text-sm font-medium text-gray-400">
+        <div th:class="${activeStep == 'showtime'} ? 'text-blue-600 font-semibold border-b-2 border-blue-600 pb-4 -mb-4' : ''">
+            Ch&#7885;n phim / R&#7841;p / Su&#7845;t
+        </div>
+        <div th:class="${activeStep == 'seat'} ? 'text-blue-600 font-semibold border-b-2 border-blue-600 pb-4 -mb-4' : ''">
+            Ch&#7885;n gh&#7871;
+        </div>
+        <div th:class="${activeStep == 'food'} ? 'text-blue-600 font-semibold border-b-2 border-blue-600 pb-4 -mb-4' : ''">
+            Ch&#7885;n th&#7913;c &#259;n
+        </div>
+        <div th:class="${activeStep == 'payment'} ? 'text-blue-600 font-semibold border-b-2 border-blue-600 pb-4 -mb-4' : ''">
+            Thanh to&#225;n
+        </div>
+        <div th:class="${activeStep == 'confirm'} ? 'text-blue-600 font-semibold border-b-2 border-blue-600 pb-4 -mb-4' : ''">
+            X&#225;c nh&#7853;n
+        </div>
+    </div>
+</div>

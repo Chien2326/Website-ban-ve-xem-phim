@@ -1,0 +1,32 @@
+<main class="main" th:fragment="main">
+    <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Lịch chiếu', 'Quản lý phim', @{/admin})}"></div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body table-responsive">
+                <h5 class="card-title">Showtimes</h5>
+                <p class="text-muted small">Phim → Rạp → Phòng → Giờ chiếu; giá gốc (price_base), định dạng (2D/3D/IMAX).</p>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th><th>Phim</th><th>Rạp / Phòng</th><th>Bắt đầu</th><th>Kết thúc</th><th>Định dạng</th><th>Giá gốc</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="st : ${items}">
+                        <td th:text="${st.showtimeId}">1</td>
+                        <td th:text="${st.movie.title}">Phim</td>
+                        <td>
+                            <span th:text="${st.room.cinema.name}">Rạp</span> /
+                            <span th:text="${st.room.name}">Phòng</span>
+                        </td>
+                        <td th:text="${#temporals.format(st.startTime, 'dd/MM/yyyy HH:mm')}">—</td>
+                        <td th:text="${#temporals.format(st.endTime, 'dd/MM/yyyy HH:mm')}">—</td>
+                        <td th:text="${st.formatType}">2D</td>
+                        <td th:text="${#numbers.formatDecimal(st.priceBase, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>

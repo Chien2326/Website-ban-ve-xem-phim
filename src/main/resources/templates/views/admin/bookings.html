@@ -1,0 +1,66 @@
+<main class="main" th:fragment="main">
+    <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Danh sách đơn hàng', 'Quản lý đơn hàng', @{/admin})}"></div>
+    <section class="section">
+        <div class="card mb-3">
+            <div class="card-body">
+                <form class="row g-2" th:action="@{/admin/bookings}" method="get">
+                    <div class="col-md-3">
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="">Tất cả trạng thái</option>
+                            <option th:each="s : ${T(hethongwebbanvexemphim.entity.enums.BookingStatus).values()}"
+                                    th:value="${s.name()}" th:text="${s.name()}"
+                                    th:selected="${filterStatus != null and filterStatus.name() == s.name()}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" name="keyword" class="form-control form-control-sm"
+                               placeholder="Mã đơn, SĐT, tên khách..."
+                               th:value="${filterKeyword}">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Lọc</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Mã đơn</th><th>Khách hàng</th><th>SĐT</th><th>Tổng tiền</th>
+                        <th>Thanh toán</th><th>Trạng thái</th><th>Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="b : ${items}">
+                        <td th:text="${'#' + b.bookingId}">#1</td>
+                        <td th:text="${b.user.fullName}">Khách</td>
+                        <td th:text="${b.user.phone}">09x</td>
+                        <td th:text="${#numbers.formatDecimal(b.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</td>
+                        <td th:text="${b.paymentMethod}">ATM</td>
+                        <td>
+                            <span th:if="${b.status.name() == 'Paid'}" class="badge bg-success" th:text="${b.status}">Paid</span>
+                            <span th:if="${b.status.name() == 'Pending'}" class="badge bg-warning text-dark" th:text="${b.status}">Pending</span>
+                            <span th:if="${b.status.name() == 'Cancelled'}" class="badge bg-danger" th:text="${b.status}">Cancelled</span>
+                        </td>
+                        <td class="text-nowrap">
+                            <form th:action="@{/admin/bookings/{id}/status(id=${b.bookingId})}" method="post" class="d-inline">
+                                <input type="hidden" name="status" value="Paid">
+                                <button type="submit" class="btn btn-outline-success btn-sm" title="Xác nhận thanh toán">Paid</button>
+                            </form>
+                            <form th:action="@{/admin/bookings/{id}/status(id=${b.bookingId})}" method="post" class="d-inline">
+                                <input type="hidden" name="status" value="Cancelled">
+                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Hủy đơn">Hủy</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(items)}">
+                        <td colspan="7" class="text-center text-muted">Không có đơn hàng</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>

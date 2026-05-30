@@ -1,0 +1,43 @@
+<!-- Fragment: modal xác nhận độ tuổi (nhúng từ thanh-toan.html) -->
+<div th:fragment="ageConfirmationModal"
+     id="ageConfirmationModal"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+
+    <div id="ageModalBackdrop" class="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+
+    <div class="relative bg-white rounded-md shadow-2xl max-w-[440px] w-full p-8 text-center z-10">
+
+        <div th:if="${checkout.rating != null}"
+             th:text="${checkout.rating}"
+             th:class="${checkout.ratingBadgeClass + ' text-white text-[11px] font-bold px-2.5 py-0.5 rounded mb-4 tracking-wider inline-block'}">
+            K
+        </div>
+        <div th:unless="${checkout.rating != null}"
+             class="inline-block bg-gray-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded mb-4 tracking-wider">
+            ?
+        </div>
+
+        <h3 class="text-gray-700 font-bold text-[17px] leading-snug max-w-[320px] mx-auto mb-2">
+            Xác nhận mua vé cho người có độ tuổi phù hợp
+        </h3>
+
+        <p class="text-xs text-gray-500 mb-3 font-medium" th:text="${checkout.movieTitle}">Tên phim</p>
+
+        <p class="text-[#2563eb] text-[11.5px] leading-relaxed italic font-medium px-2 mb-8"
+           th:text="${T(hethongwebbanvexemphim.service.BookingService).ageConfirmationMessage(checkout.rating)}">
+            Nội dung theo độ tuổi phim.
+        </p>
+
+        <div class="grid grid-cols-2 gap-4">
+            <button type="button" id="ageDeclineBtn"
+                    class="bg-[#eaeaea] hover:bg-[#dddddd] text-gray-700 font-medium text-xs py-2.5 px-4 rounded transition-colors duration-150">
+                Từ chối
+            </button>
+            <button type="button" id="ageConfirmBtn"
+                    class="bg-[#f97316] hover:bg-[#ea580c] text-white font-bold text-xs py-2.5 px-4 rounded shadow-sm transition-colors duration-150">
+                Xác nhận
+            </button>
+        </div>
+
+    </div>
+</div>

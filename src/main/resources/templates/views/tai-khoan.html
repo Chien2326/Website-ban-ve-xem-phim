@@ -1,0 +1,268 @@
+<main class="container my-5" th:fragment="main">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <div class="lg:col-span-4 space-y-4">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
+
+                    <div class="flex flex-col items-center border-b border-gray-100 pb-5">
+                        <div class="relative w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 border-2 border-gray-300 shadow-inner group cursor-pointer">
+                            <i class="fa-solid fa-camera text-xl opacity-0 group-hover:opacity-100 transition absolute inset-0 flex items-center justify-center bg-black/40 rounded-full text-white text-base"></i>
+                            <i class="fa-regular fa-image text-2xl group-hover:opacity-0 transition"></i>
+                        </div>
+                        <h3 class="text-gray-700 font-bold text-sm mt-3 flex items-center">
+                            Nguyễn Văn Chiến
+                            <i class="fa-solid fa-medal text-yellow-500 text-xs ml-1.5"></i>
+                        </h3>
+                        <span class="text-[11px] text-gray-400 font-medium mt-1 uppercase tracking-wider">Star</span>
+                        <span class="text-orange-500 font-bold text-xs mt-2 flex items-center bg-orange-50 px-2 py-0.5 rounded">
+                                <i class="fa-solid fa-gift text-[10px] mr-1.5"></i> 4 Stars
+                            </span>
+                    </div>
+
+                    <div class="py-5 border-b border-gray-100">
+                        <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-500 font-medium flex items-center">
+                                    Tổng chi tiêu 2026
+                                    <i class="fa-regular fa-circle-question text-blue-400 ml-1 cursor-pointer"></i>
+                                </span>
+                            <span class="text-orange-600 font-bold text-sm">120.000 đ</span>
+                        </div>
+
+                        <div class="mt-6 relative px-1">
+                            <div class="h-1.5 bg-gray-100 rounded-full w-full relative">
+                                <div class="absolute top-0 left-0 h-full bg-blue-400 rounded-full" style="width: 5%"></div>
+                            </div>
+
+                            <div class="absolute -top-1.5 left-0 right-0 flex justify-between px-1 text-[10px]">
+                                <div class="flex flex-col items-center">
+                                    <i class="fa-solid fa-circle text-blue-400 text-[8px] bg-white rounded-full"></i>
+                                    <i class="fa-solid fa-ribbon text-orange-400 text-xs mt-[-18px] mb-2"></i>
+                                    <span class="text-gray-500 mt-2">0 đ</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <i class="fa-solid fa-circle text-gray-300 text-[8px] bg-white rounded-full"></i>
+                                    <div class="w-4 h-4 bg-white border border-gray-300 rounded-full flex items-center justify-center font-bold text-[8px] text-blue-500 mt-[-22px] mb-2">G</div>
+                                    <span class="text-gray-400 mt-2">2.000.000 đ</span>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <i class="fa-solid fa-circle text-gray-300 text-[8px] bg-white rounded-full"></i>
+                                    <div class="w-4 h-4 bg-white border border-gray-300 rounded-full flex items-center justify-center font-bold text-[8px] text-orange-500 mt-[-22px] mb-2">X</div>
+                                    <span class="text-gray-400 mt-2">4.000.000 đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 text-xs font-medium text-gray-600 divide-y divide-gray-50">
+                        <a href="tel:19002224" class="flex justify-between items-center py-3 hover:text-orange-500 transition">
+                            <span>HOTLINE hỗ trợ: <span class="text-blue-600">19002224 (9:00 - 22:00)</span></span>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                        </a>
+                        <a href="mailto:hotro@galaxystudio.vn" class="flex justify-between items-center py-3 hover:text-orange-500 transition">
+                            <span>Email: <span class="text-blue-600">hotro@galaxystudio.vn</span></span>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                        </a>
+                        <a href="#" class="flex justify-between items-center py-3 hover:text-orange-500 transition">
+                            <span>Câu hỏi thường gặp</span>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 bg-white rounded-lg shadow-sm border border-gray-100 p-5">
+
+                <div class="border-b border-gray-200 overflow-x-auto">
+                    <nav class="flex space-x-8 text-xs font-bold uppercase tracking-wider whitespace-nowrap pb-1">
+                        <button onclick="switchTab('history')" id="btn-history" class="tab-btn py-2 border-b-2 border-blue-600 text-blue-600 transition">
+                            Lịch Sử Giao Dịch
+                        </button>
+                        <button onclick="switchTab('profile')" id="btn-profile" class="tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition">
+                            Thông Tin Cá Nhân
+                        </button>
+                        <button onclick="switchTab('notifications')" id="btn-notifications" class="tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition flex items-center">
+                            Thông Báo
+                            <span class="ml-1 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-[9px] font-bold">2</span>
+                        </button>
+                        <button onclick="switchTab('gifts')" id="btn-gifts" class="tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition">
+                            Quà Tặng
+                        </button>
+                        <button onclick="switchTab('policies')" id="btn-policies" class="tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition">
+                            Chính Sách
+                        </button>
+                    </nav>
+                </div>
+
+                <div class="mt-6">
+
+                    <div id="tab-history" class="tab-content space-y-4">
+                        <p class="text-center text-xs text-gray-400 italic mb-4">Lưu ý: chỉ hiển thị 20 giao dịch gần nhất</p>
+                        <h4 class="text-xs text-gray-400 font-semibold uppercase tracking-wider border-b border-gray-50 pb-2">Tháng 05/2026</h4>
+
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-100 rounded-lg p-4 bg-gray-50/30 hover:shadow-sm transition gap-4">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-16 bg-gray-200 rounded overflow-hidden flex-shrink-0 shadow-sm">
+                                    <div class="w-full h-full bg-[#1e293b] flex items-center justify-center text-white font-bold text-[9px] text-center p-1 leading-tight">HEO NĂM MÓNG</div>
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex items-center space-x-2">
+                                        <h5 class="text-sm font-bold text-gray-800">Heo Năm Móng</h5>
+                                        <span class="bg-orange-500 text-white font-bold text-[9px] px-1 rounded scale-90">T18</span>
+                                    </div>
+                                    <p class="text-[11px] text-gray-400">2D Phụ Đề</p>
+                                    <p class="text-xs text-gray-600 font-medium">Galaxy Vinh - <span class="text-gray-500">Rạp 1</span></p>
+                                    <p class="text-[11px] text-gray-400"><strong class="text-gray-700 font-semibold">20:15</strong> - Thứ Năm, <span class="font-medium text-gray-500">14/05/2026</span></p>
+                                </div>
+                            </div>
+                            <button class="text-xs text-orange-500 font-semibold border border-orange-200 hover:bg-orange-50 rounded-md px-3 py-1.5 transition self-end sm:self-center">
+                                Chi tiết
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="tab-profile" class="tab-content hidden space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="space-y-1.5">
+                                <label class="text-gray-500 font-medium">Họ và tên</label>
+                                <div class="relative">
+                                    <i class="fa-regular fa-user absolute left-3 top-3 text-gray-400"></i>
+                                    <input type="text" value="Nguyễn Văn Chiến" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-gray-500 font-medium">Ngày sinh</label>
+                                <div class="relative">
+                                    <i class="fa-regular fa-calendar absolute left-3 top-3 text-gray-400"></i>
+                                    <input type="text" value="29/11/2005" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-gray-500 font-medium">Email</label>
+                                    <button class="text-orange-500 font-semibold text-[11px] hover:underline">Thay đổi</button>
+                                </div>
+                                <div class="relative">
+                                    <i class="fa-regular fa-envelope absolute left-3 top-3 text-gray-400"></i>
+                                    <input type="email" value="nguyenvanchiencity@gmail.com" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-gray-500 font-medium">Số điện thoại</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-mobile-screen-button absolute left-3 top-3 text-gray-400"></i>
+                                    <input type="text" value="0365675128" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
+                                </div>
+                            </div>
+                            <div class="space-y-1.5 md:col-span-2">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-gray-500 font-medium">Mật khẩu</label>
+                                    <button class="text-orange-500 font-semibold text-[11px] hover:underline">Thay đổi</button>
+                                </div>
+                                <div class="relative">
+                                    <i class="fa-solid fa-lock absolute left-3 top-3 text-gray-400"></i>
+                                    <input type="password" value="............" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 tracking-widest font-medium">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-6 text-xs font-medium text-gray-600 pt-1">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="gender" checked class="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-400">
+                                <span>Nam</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="gender" class="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-400">
+                                <span>Nữ</span>
+                            </label>
+                        </div>
+
+                        <div class="flex justify-end pt-2">
+                            <button class="bg-[#f59e0b] hover:bg-orange-500 text-white font-bold text-xs uppercase tracking-wider px-6 py-2.5 rounded shadow transition">
+                                Cập nhật
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="tab-notifications" class="tab-content hidden space-y-3">
+
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-100 rounded-lg p-3.5 bg-gray-50/40 hover:shadow-sm transition text-xs gap-3">
+                            <div class="flex items-start space-x-3.5">
+                                <div class="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-black text-[10px] mt-0.5 flex-shrink-0">G</div>
+                                <div class="space-y-1">
+                                    <h5 class="font-bold text-gray-800 text-sm">Stars ơi, xem phim vui không nè?</h5>
+                                    <p class="text-gray-500 leading-relaxed">Stars có hài lòng với bộ phim và dịch vụ vừa trải nghiệm tại...</p>
+                                    <span class="text-[10px] text-gray-400 block pt-0.5">22:15 14/05/2026</span>
+                                </div>
+                            </div>
+                            <button class="text-orange-500 font-semibold border border-orange-200 hover:bg-orange-50 rounded px-2.5 py-1.5 transition self-end sm:self-center text-[11px]">
+                                Chi tiết
+                            </button>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-100 rounded-lg p-3.5 bg-gray-50/40 hover:shadow-sm transition text-xs gap-3">
+                            <div class="flex items-start space-x-3.5">
+                                <div class="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-black text-[10px] mt-0.5 flex-shrink-0">G</div>
+                                <div class="space-y-1">
+                                    <h5 class="font-bold text-gray-800 text-sm">Bạn ơi, 1 tiếng nữa suất chiếu bắt đầu đó!</h5>
+                                    <p class="text-gray-500 leading-relaxed">Suất chiếu Heo Năm Móng sẽ bắt đầu lúc 20:15 14/05/202...</p>
+                                    <span class="text-[10px] text-gray-400 block pt-0.5">19:15 14/05/2026</span>
+                                </div>
+                            </div>
+                            <button class="text-orange-500 font-semibold border border-orange-200 hover:bg-orange-50 rounded px-2.5 py-1.5 transition self-end sm:self-center text-[11px]">
+                                Chi tiết
+                            </button>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-100 rounded-lg p-3.5 bg-gray-50/40 hover:shadow-sm transition text-xs gap-3">
+                            <div class="flex items-start space-x-3.5">
+                                <div class="w-7 h-7 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-black text-[10px] mt-0.5 flex-shrink-0">X</div>
+                                <div class="space-y-1">
+                                    <h5 class="font-bold text-gray-800 text-sm">Bạn ơi, mua vé thành công rồi nè!</h5>
+                                    <p class="text-gray-500 leading-relaxed">Heo Năm Móng 20:15 14/05/2026 Galaxy Vinh</p>
+                                    <span class="text-[10px] text-gray-400 block pt-0.5">09:26 14/05/2026</span>
+                                </div>
+                            </div>
+                            <button class="text-orange-500 font-semibold border border-orange-200 hover:bg-orange-50 rounded px-2.5 py-1.5 transition self-end sm:self-center text-[11px]">
+                                Chi tiết
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div id="tab-gifts" class="tab-content hidden text-center py-10 text-xs text-gray-400">
+                        <i class="fa-solid fa-box-open text-3xl mb-2 text-gray-300 block"></i>
+                        Hiện tại không có quà tặng nào khả dụng.
+                    </div>
+                    <div id="tab-policies" class="tab-content hidden text-center py-10 text-xs text-gray-400">
+                        <i class="fa-solid fa-file-shield text-3xl mb-2 text-gray-300 block"></i>
+                        Các điều khoản quy chế đang được cập nhật.
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+<script>
+    function switchTab(tabName) {
+        // 1. Ẩn toàn bộ nội dung của các tab đang mở
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+        // 2. Trả tất cả các phím tab về màu xám mặc định
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('border-blue-600', 'text-blue-600');
+            btn.classList.add('border-transparent', 'text-gray-400');
+        });
+
+        // 3. Hiển thị nội dung của Tab vừa được nhấn chọn
+        document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+        // 4. Highlight làm nổi bật phím điều hướng của Tab hiện tại
+        const activeBtn = document.getElementById(`btn-${tabName}`);
+        activeBtn.classList.remove('border-transparent', 'text-gray-400');
+        activeBtn.classList.add('border-blue-600', 'text-blue-600');
+    }
+</script>

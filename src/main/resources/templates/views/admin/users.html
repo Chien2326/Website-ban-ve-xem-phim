@@ -1,0 +1,27 @@
+<main class="main" th:fragment="main">
+    <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Người dùng', 'Hệ thống', @{/admin})}"></div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body table-responsive">
+                <p class="text-muted small">Khách hàng &amp; nhân viên: email, SĐT, ngày sinh (ưu đãi), vai trò.</p>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th><th>Họ tên</th><th>Email</th><th>SĐT</th><th>Ngày sinh</th><th>Vai trò</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u : ${items}">
+                        <td th:text="${u.userId}">1</td>
+                        <td th:text="${u.fullName}">Nguyễn A</td>
+                        <td th:text="${u.email}">a@mail.com</td>
+                        <td th:text="${u.phone}">09x</td>
+                        <td th:text="${u.birthday != null ? #temporals.format(u.birthday, 'dd/MM/yyyy') : '—'}">—</td>
+                        <td th:text="${u.role.roleName}">CUSTOMER</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>

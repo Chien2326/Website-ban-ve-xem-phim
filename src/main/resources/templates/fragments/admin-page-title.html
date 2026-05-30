@@ -1,0 +1,9 @@
+<div th:fragment="adminPageTitle(title, parent, parentUrl)" class="pagetitle">
+    <h1 th:text="${title}">Tiêu đề</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="${parentUrl} ?: @{/admin}" th:text="${parent} ?: 'Admin'">Admin</a></li>
+            <li class="breadcrumb-item active" th:text="${title}">Trang</li>
+        </ol>
+    </nav>
+</div>

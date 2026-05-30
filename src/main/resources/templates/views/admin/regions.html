@@ -1,0 +1,18 @@
+<main class="main" th:fragment="main">
+    <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Tỉnh / Thành phố', 'Quản lý rạp', @{/admin})}"></div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead><tr><th>ID</th><th>Khu vực</th></tr></thead>
+                    <tbody>
+                    <tr th:each="r : ${items}">
+                        <td th:text="${r.regionId}">1</td>
+                        <td th:text="${r.regionName}">Hà Nội</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>

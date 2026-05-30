@@ -1,0 +1,183 @@
+<main class="container my-5" th:fragment="main">
+    <div th:replace="~{fragments/booking-steps :: bookingSteps('payment')}"></div>
+
+    <div th:if="${checkout == null}"
+         class="max-w-3xl mx-auto px-4 py-16 text-center text-gray-500">
+        <i class="fa-solid fa-ticket text-3xl mb-4 text-orange-400"></i>
+        <p class="mb-2" th:if="${checkoutError != null}" th:text="${checkoutError}">Lỗi</p>
+        <p th:unless="${checkoutError != null}" class="mb-4">Vui lòng chọn ghế và suất chiếu trước khi thanh toán.</p>
+        <a th:href="@{/}" class="text-orange-500 font-semibold hover:underline">Về trang chủ</a>
+    </div>
+
+    <main th:if="${checkout != null}"
+          th:with="posterUrl=${checkout.posterUrl != null and !#strings.isEmpty(checkout.posterUrl) ? checkout.posterUrl : defaultPoster}"
+          class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div class="lg:col-span-2 space-y-6">
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h2 class="text-base font-semibold text-gray-700 mb-4">Khuyến mãi</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1.5">Mã khuyến mãi</label>
+                        <div class="flex space-x-3 max-w-md">
+                            <input type="text" disabled
+                                   class="flex-grow border border-gray-200 rounded px-3 py-2 text-sm bg-gray-50 text-gray-400"
+                                   placeholder="Sắp có">
+                            <button type="button" disabled
+                                    class="bg-gray-300 text-white font-medium px-6 py-2 rounded text-sm cursor-not-allowed">
+                                Áp Dụng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h2 class="text-base font-semibold text-gray-700 mb-6">Phương thức thanh toán</h2>
+
+                <div class="space-y-4" id="payment-methods">
+                    <label th:each="method, stat : ${checkout.paymentMethods}"
+                           class="flex items-center space-x-4 cursor-pointer p-2 rounded hover:bg-gray-50 transition">
+                        <input type="radio"
+                               name="paymentMethod"
+                               th:value="${method.name()}"
+                               th:checked="${stat.first}"
+                               class="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500">
+                        <div class="w-12 h-8 rounded flex items-center justify-center text-[9px] font-bold flex-shrink-0"
+                             th:switch="${method.name()}">
+                            <span th:case="'Momo'" class="w-full h-full bg-[#a5156a] text-white rounded flex items-center justify-center">MoMo</span>
+                            <span th:case="'ZaloPay'" class="w-full h-full bg-[#0084ff] text-white rounded flex items-center justify-center">Zalo</span>
+                            <span th:case="'VNPAY'" class="w-full h-full bg-blue-700 text-white rounded flex items-center justify-center">VNPay</span>
+                            <span th:case="*" class="w-full h-full bg-blue-50 border border-blue-200 text-blue-700 rounded flex items-center justify-center">ATM</span>
+                        </div>
+                        <span class="text-xs text-gray-600"
+                              th:text="${T(hethongwebbanvexemphim.service.BookingService).paymentMethodLabel(method)}">
+                            Phương thức
+                        </span>
+                    </label>
+                </div>
+
+                <p class="text-[11px] text-gray-400 mt-8 leading-relaxed">
+                    <span class="text-red-500 font-medium">(*)</span> Bằng việc click/chạm vào THANH TOÁN bên phải, bạn đã xác nhận hiểu rõ các Quy Định Giao Dịch Trực Tuyến.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="flex flex-col space-y-4 h-fit">
+
+            <div th:replace="~{fragments/booking-hold-timer :: bookingHoldTimer}"></div>
+
+            <div class="bg-white rounded-lg p-5 shadow-sm border border-gray-100 flex flex-col justify-between border-t-4 border-t-orange-500">
+
+                <div class="flex space-x-4 mb-6">
+                    <div class="w-24 h-36 bg-gray-200 rounded overflow-hidden flex-shrink-0 relative shadow-inner">
+                        <img th:src="${posterUrl}" th:alt="${checkout.movieTitle}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex flex-col justify-start space-y-2">
+                        <h2 class="text-base font-bold text-gray-800 leading-tight" th:text="${checkout.movieTitle}">Tên phim</h2>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-gray-500 font-medium" th:text="${checkout.formatType}">2D</span>
+                            <span th:if="${checkout.rating != null}"
+                                  th:text="${checkout.rating}"
+                                  th:class="${checkout.ratingBadgeClass + ' text-white text-[10px] font-bold px-1.5 py-0.5 rounded'}">T16</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3 text-xs text-gray-600 border-b border-dashed border-gray-200 pb-5 mb-5">
+                    <div class="flex justify-between">
+                        <span class="font-semibold text-gray-800" th:text="${checkout.cinemaName}">Rạp</span>
+                        <span class="text-gray-400 font-medium" th:text="${checkout.roomName}">Phòng</span>
+                    </div>
+                    <div>
+                        <span>Suất: <strong class="text-gray-800" th:text="${#temporals.format(checkout.startTime, 'HH:mm')}">19:45</strong>
+                        - <span th:text="${#temporals.format(checkout.startTime, 'EEEE, dd/MM/yyyy', new java.util.Locale('vi', 'VN'))}">Ngày</span></span>
+                    </div>
+                    <div th:each="seat : ${checkout.selectedSeats}"
+                         class="flex justify-between text-gray-700">
+                        <span class="text-gray-400">Ghế: <strong th:text="${seat.seatLabel}">A1</strong></span>
+                        <span class="font-semibold"
+                              th:text="${#numbers.formatDecimal(seat.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">75.000 đ</span>
+                    </div>
+                    <div th:each="product : ${checkout.selectedProducts}"
+                         class="flex justify-between text-gray-700">
+                        <span th:text="${product.quantity} + 'x ' + ${product.productName}">1x Combo</span>
+                        <span class="font-semibold"
+                              th:text="${#numbers.formatDecimal(product.lineTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">50.000 đ</span>
+                    </div>
+                    <div class="pt-2 flex justify-between text-gray-700 border-t border-dashed border-gray-100">
+                        <span>Tiền vé</span>
+                        <span th:text="${#numbers.formatDecimal(checkout.seatTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">75.000 đ</span>
+                    </div>
+                    <div th:unless="${#lists.isEmpty(checkout.selectedProducts)}"
+                         class="flex justify-between text-gray-700">
+                        <span>Thức ăn / Combo</span>
+                        <span th:text="${#numbers.formatDecimal(checkout.productTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-sm font-semibold text-gray-700">Tổng cộng</span>
+                    <span class="text-lg font-bold text-orange-500"
+                          th:text="${#numbers.formatDecimal(checkout.grandTotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">75.000 đ</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <a th:href="${backUrl}"
+                       class="col-span-1 py-2.5 border border-orange-500 text-orange-500 rounded font-medium text-center hover:bg-orange-50 transition text-xs">
+                        Quay lại
+                    </a>
+                    <button type="button" id="btn-payment-confirm"
+                            class="col-span-2 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded font-medium text-center transition shadow-md text-xs">
+                        Thanh Toán
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script th:if="${checkout != null}" th:src="@{/js/booking-hold-timer.js}"></script>
+    <script th:if="${checkout != null}" th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const btn = document.getElementById('btn-payment-confirm');
+            const showtimeId = /*[[${checkout.showtimeId}]]*/ 0;
+            const showSeatIds = /*[[${showSeatIds}]]*/ '';
+            const productIds = /*[[${productIds}]]*/ [];
+            const quantities = /*[[${quantities}]]*/ [];
+
+            BookingHoldTimer.init({
+                showtimeId: showtimeId,
+                showSeatIds: showSeatIds,
+                allowStart: false,
+                onExpired: function () {
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                }
+            });
+
+            if (!btn) return;
+
+            btn.addEventListener('click', function () {
+                const selected = document.querySelector('input[name="paymentMethod"]:checked');
+                const method = selected ? selected.value : 'ATM';
+                const params = new URLSearchParams();
+                params.set('showtimeId', showtimeId);
+                params.set('showSeatIds', showSeatIds);
+                params.set('paymentMethod', method);
+                if (productIds && productIds.length) {
+                    productIds.forEach(function (id) { params.append('productIds', id); });
+                    if (quantities && quantities.length) {
+                        quantities.forEach(function (q) { params.append('quantities', q); });
+                    }
+                }
+                window.location.href = '/xac-nhan?' + params.toString();
+            });
+        });
+    </script>
+</main>

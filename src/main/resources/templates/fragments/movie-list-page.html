@@ -1,0 +1,41 @@
+<main class="max-w-7xl mx-auto px-4 py-12 w-full flex-grow" th:fragment="movieListPage(listTab, listTitle)">
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-4 mb-8">
+        <div>
+            <h1 class="text-xl font-bold text-gray-800" th:text="${listTitle}">Phim đang chiếu</h1>
+            <p class="text-xs text-gray-400 mt-1" th:text="${#lists.size(movies)} + ' phim'">0 phim</p>
+        </div>
+
+        <div class="relative group">
+            <div class="text-xs font-medium text-gray-500 flex items-center cursor-pointer bg-white border border-gray-200 px-2.5 py-1.5 rounded hover:bg-gray-50">
+                <i class="fa-solid fa-location-dot text-blue-500 mr-1"></i>
+                <span th:if="${selectedRegionId == null}">Toàn quốc</span>
+                <span th:each="r : ${regions}" th:if="${r.regionId == selectedRegionId}" th:text="${r.regionName}">Khu vực</span>
+                <i class="fa-solid fa-chevron-down text-[9px] ml-1.5"></i>
+            </div>
+            <div class="absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30">
+                <ul class="py-1 text-gray-700 text-[13px]">
+                    <li>
+                        <a th:href="@{/phim-dang-chieu}" th:if="${listTab == 'dang-chieu'}"
+                           class="block px-4 py-2 hover:bg-blue-50 hover:text-blue-600"
+                           th:classappend="${selectedRegionId == null} ? 'font-semibold text-blue-600' : ''">Toàn quốc</a>
+                        <a th:href="@{/phim-sap-chieu}" th:if="${listTab == 'sap-chieu'}"
+                           class="block px-4 py-2 hover:bg-blue-50 hover:text-blue-600"
+                           th:classappend="${selectedRegionId == null} ? 'font-semibold text-blue-600' : ''">Toàn quốc</a>
+                    </li>
+                    <li th:each="region : ${regions}">
+                        <a th:href="@{/phim-dang-chieu(regionId=${region.regionId})}" th:if="${listTab == 'dang-chieu'}"
+                           th:text="${region.regionName}"
+                           th:classappend="${region.regionId == selectedRegionId} ? 'block px-4 py-2 font-semibold text-blue-600 bg-blue-50/60' : 'block px-4 py-2 hover:bg-blue-50 hover:text-blue-600'"></a>
+                        <a th:href="@{/phim-sap-chieu(regionId=${region.regionId})}" th:if="${listTab == 'sap-chieu'}"
+                           th:text="${region.regionName}"
+                           th:classappend="${region.regionId == selectedRegionId} ? 'block px-4 py-2 font-semibold text-blue-600 bg-blue-50/60' : 'block px-4 py-2 hover:bg-blue-50 hover:text-blue-600'"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/movie-grid :: movieGrid(null, false)}"></div>
+
+</main>

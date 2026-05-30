@@ -1,0 +1,60 @@
+<div th:fragment="movieGrid(showMoreUrl, showMoreButton)">
+
+    <div th:if="${#lists.isEmpty(movies)}"
+         class="text-center py-16 text-gray-400 text-sm border border-dashed border-gray-200 rounded-lg">
+        <i class="fa-solid fa-film text-2xl mb-3 block"></i>
+        <p>Chưa có phim phù hợp bộ lọc này.</p>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(movies)}"
+         class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+
+        <a th:each="movie : ${movies}"
+           th:href="${movie.detailUrl}"
+           class="group flex flex-col space-y-2 cursor-pointer">
+            <div class="aspect-[2/3] w-full bg-gray-200 rounded-lg overflow-hidden relative shadow-sm group-hover:shadow-md transition">
+                <img th:src="${movie.posterUrl != null && !#strings.isEmpty(movie.posterUrl)} ? ${movie.posterUrl} : ${defaultPoster}"
+                     th:alt="${movie.title}"
+                     class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+                <div th:if="${movie.star != null && movie.star > 0}"
+                     class="absolute bottom-2.5 right-2.5 bg-black/70 backdrop-blur-sm text-white px-1.5 py-0.5 rounded flex items-center space-x-1 text-[10px] font-bold">
+                    <i class="fa-solid fa-star text-yellow-400 text-[9px]"></i>
+                    <span th:text="${#numbers.formatDecimal(movie.star, 1, 1)}">8.2</span>
+                </div>
+                <div th:if="${movie.durationMinutes != null}"
+                     class="absolute bottom-2.5 left-2.5 bg-black/70 backdrop-blur-sm text-white px-1.5 py-0.5 rounded flex items-center space-x-1 text-[10px] font-bold">
+                    <i class="fa-regular fa-clock text-yellow-400 text-[9px]"></i>
+                    <span th:text="${movie.durationMinutes + ' phút'}">120 phút</span>
+                </div>
+                <div th:if="${movie.statusLabel != null}"
+                     class="absolute top-2.5 left-2.5 bg-white/90 text-gray-700 px-1.5 py-0.5 rounded text-[9px] font-bold"
+                     th:text="${movie.statusLabel}">Đang chiếu</div>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-xs sm:text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-orange-500 transition"
+                    th:text="${movie.title}">Tên phim</h3>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span th:if="${movie.rating != null}"
+                          th:text="${movie.rating}"
+                          th:class="${movie.ratingBadgeClass + ' text-white text-[9px] font-bold px-1.5 py-0.5 rounded'}">T13</span>
+                    <span th:if="${movie.releaseDate != null}"
+                          class="text-[10px] text-gray-400 font-medium"
+                          th:text="${#temporals.format(movie.releaseDate, 'dd/MM/yyyy')}">01/01/2026</span>
+                </div>
+                <p th:if="${movie.genres != null && !movie.genres.isEmpty()}"
+                   class="text-[10px] text-gray-400 line-clamp-1"
+                   th:text="${#strings.listJoin(movie.genres, ' · ')}">Hành động</p>
+            </div>
+        </a>
+
+    </div>
+
+    <div th:if="${showMoreButton && !#lists.isEmpty(movies)}" class="flex justify-center mt-12">
+        <a th:href="${showMoreUrl}"
+           class="border border-orange-500 text-orange-500 hover:bg-orange-50 transition font-medium text-xs px-5 py-2 rounded flex items-center space-x-1">
+            <span>Xem thêm</span>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </a>
+    </div>
+
+</div>

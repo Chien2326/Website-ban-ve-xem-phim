@@ -1,0 +1,46 @@
+<main class="main" th:fragment="main">
+    <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Combo / Đồ ăn', 'Bắp nước', @{/admin})}"></div>
+    <section class="section">
+        <div class="card mb-3">
+            <div class="card-body table-responsive">
+                <h5 class="card-title">Danh mục Products</h5>
+                <table class="table table-striped">
+                    <thead>
+                    <tr><th>ID</th><th>Tên</th><th>Loại</th><th>Giá</th><th>Trạng thái</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${items}">
+                        <td th:text="${p.productId}">1</td>
+                        <td th:text="${p.productName}">Combo</td>
+                        <td th:text="${p.productType}">COMBO</td>
+                        <td th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</td>
+                        <td th:text="${p.status}">AVAILABLE</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body table-responsive">
+                <h5 class="card-title">Thống kê tiêu thụ (BookingProducts)</h5>
+                <table class="table table-sm table-striped">
+                    <thead>
+                    <tr><th>ID</th><th>Đơn</th><th>Sản phẩm</th><th>SL</th><th>Đơn giá</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="bp : ${bookingProducts}">
+                        <td th:text="${bp.bookingProductId}">1</td>
+                        <td th:text="${'#' + bp.booking.bookingId}">#1</td>
+                        <td th:text="${bp.product.productName}">Bắp</td>
+                        <td th:text="${bp.quantity}">1</td>
+                        <td th:text="${#numbers.formatDecimal(bp.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(bookingProducts)}">
+                        <td colspan="5" class="text-muted text-center">Chưa có giao dịch sản phẩm</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>

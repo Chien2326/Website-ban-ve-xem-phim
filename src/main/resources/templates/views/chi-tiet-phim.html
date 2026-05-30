@@ -1,0 +1,188 @@
+<main class="container my-5" th:fragment="main" th:with="posterUrl=${movie.posterUrl != null and !#strings.isEmpty(movie.posterUrl) ? movie.posterUrl : defaultPoster}">
+    <div class="relative w-full h-[320px] md:h-[450px] bg-black overflow-hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-cover bg-center opacity-30 blur-md scale-105"
+             th:style="'background-image: url(' + ${posterUrl} + ');'">
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+
+        <div class="relative z-10 w-full max-w-4xl px-4 flex flex-col items-center justify-center h-full">
+            <div class="relative max-w-xl w-full aspect-[16/9] md:h-[320px] rounded-lg overflow-hidden shadow-2xl border border-gray-800">
+                <img th:src="${posterUrl}"
+                     th:alt="${movie.title}"
+                     class="w-full h-full object-cover">
+                <a th:if="${movie.trailerUrl != null && !#strings.isEmpty(movie.trailerUrl)}"
+                   th:href="${movie.trailerUrl}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="absolute inset-0 m-auto w-16 h-16 bg-white/90 hover:bg-white text-orange-500 rounded-full flex items-center justify-center text-2xl shadow-xl transition transform hover:scale-105 group">
+                    <i class="fa-solid fa-play ml-1 group-hover:text-orange-600"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <div class="lg:col-span-8 space-y-10">
+
+                <div class="flex flex-col sm:flex-row items-start gap-6 pb-6 border-b border-gray-100">
+                    <div class="w-36 h-52 rounded shadow-md border border-gray-100 flex-shrink-0 overflow-hidden bg-gray-200">
+                        <img th:src="${posterUrl}"
+                             th:alt="${movie.title}"
+                             class="w-full h-full object-cover">
+                    </div>
+                    <div class="space-y-3 pt-2">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <h2 class="text-2xl font-bold text-gray-800" th:text="${movie.title}">Tên phim</h2>
+                            <span th:if="${movie.rating != null}"
+                                  th:text="${movie.rating}"
+                                  th:class="${movie.ratingBadgeClass + ' text-white font-bold text-xs px-1.5 py-0.5 rounded'}">T13</span>
+                            <span th:if="${movie.statusLabel != null}"
+                                  class="bg-gray-100 text-gray-600 font-bold text-xs px-1.5 py-0.5 rounded"
+                                  th:text="${movie.statusLabel}">Đang chiếu</span>
+                        </div>
+                        <div class="flex flex-wrap gap-y-2 gap-x-4 text-xs text-gray-500 font-medium">
+                            <span th:if="${movie.durationMinutes != null}" class="flex items-center">
+                                <i class="fa-regular fa-clock mr-1.5 text-orange-400"></i>
+                                <span th:text="${movie.durationMinutes + ' phút'}">120 phút</span>
+                            </span>
+                            <span th:if="${movie.releaseDate != null}" class="flex items-center">
+                                <i class="fa-regular fa-calendar mr-1.5 text-orange-400"></i>
+                                <span th:text="${#temporals.format(movie.releaseDate, 'dd/MM/yyyy')}">01/01/2026</span>
+                            </span>
+                        </div>
+                        <div th:if="${movie.star != null && movie.star > 0}" class="flex items-center space-x-1.5 pt-1">
+                            <i class="fa-solid fa-star text-orange-400 text-sm"></i>
+                            <span class="text-sm font-bold text-gray-700"
+                                  th:text="${#numbers.formatDecimal(movie.star, 1, 1)}">8.0</span>
+                        </div>
+                        <p th:if="${movie.genres != null && !movie.genres.isEmpty()}"
+                           class="text-xs text-gray-500 font-medium pt-1">
+                            Thể loại:
+                            <span class="text-gray-700" th:text="${#strings.listJoin(movie.genres, ' · ')}">Hành động</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-3" th:if="${movie.description != null && !#strings.isEmpty(movie.description)}">
+                    <h3 class="text-sm font-bold text-blue-900 border-l-4 border-blue-700 pl-2 uppercase tracking-wide">Nội Dung Phim</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed font-medium whitespace-pre-line"
+                       th:text="${movie.description}">Mô tả phim</p>
+                </div>
+
+                <div class="space-y-6 pt-4">
+                    <h3 class="text-sm font-bold text-blue-900 border-l-4 border-blue-700 pl-2 uppercase tracking-wide">Lịch Chiếu</h3>
+
+                    <div class="flex flex-col sm:flex-row gap-4 border-b border-gray-100 pb-4">
+                        <div class="flex flex-wrap gap-2">
+                            <a th:each="scheduleDate : ${scheduleDates}"
+                               th:href="@{/phim/{id}(id=${movie.movieId}, date=${scheduleDate}, regionId=${selectedRegionId}, cinemaId=${selectedCinemaId})}"
+                               th:class="${scheduleDate.equals(selectedDate)} ? 'bg-blue-600 text-white rounded px-4 py-2 text-center shadow-sm transition' : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 rounded px-4 py-2 text-center transition'">
+                                <span th:if="${scheduleDate.equals(T(java.time.LocalDate).now())}"
+                                      class="block text-xs font-bold uppercase">Hôm nay</span>
+                                <span th:unless="${scheduleDate.equals(T(java.time.LocalDate).now())}"
+                                      class="block text-xs font-bold uppercase"
+                                      th:text="${#temporals.format(scheduleDate, 'EEE', new java.util.Locale('vi'))}">T5</span>
+                                <span class="text-[11px] font-semibold"
+                                      th:classappend="${scheduleDate.equals(selectedDate)} ? 'opacity-90' : 'text-gray-400'"
+                                      th:text="${#temporals.format(scheduleDate, 'dd/MM')}">27/05</span>
+                            </a>
+                        </div>
+
+                        <form class="flex gap-2 sm:ml-auto w-full sm:w-auto" method="get" th:action="@{/phim/{id}(id=${movie.movieId})}">
+                            <input type="hidden" name="date" th:value="${selectedDate}">
+                            <select name="regionId"
+                                    onchange="this.form.submit()"
+                                    class="w-full sm:w-36 bg-white border border-gray-200 rounded px-3 py-1.5 text-xs font-medium text-gray-600 focus:outline-none focus:border-blue-500">
+                                <option value="" th:selected="${selectedRegionId == null}">Toàn quốc</option>
+                                <option th:each="region : ${regions}"
+                                        th:value="${region.regionId}"
+                                        th:text="${region.regionName}"
+                                        th:selected="${region.regionId == selectedRegionId}"></option>
+                            </select>
+                            <select name="cinemaId"
+                                    onchange="this.form.submit()"
+                                    class="w-full sm:w-36 bg-white border border-gray-200 rounded px-3 py-1.5 text-xs font-medium text-gray-600 focus:outline-none focus:border-blue-500">
+                                <option value="" th:selected="${selectedCinemaId == null}">Tất cả rạp</option>
+                                <option th:each="cinema : ${cinemas}"
+                                        th:value="${cinema.cinemaId}"
+                                        th:text="${cinema.name}"
+                                        th:selected="${cinema.cinemaId == selectedCinemaId}"></option>
+                            </select>
+                        </form>
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(schedule)}"
+                         class="text-center py-10 text-gray-400 text-sm border border-dashed border-gray-200 rounded-lg">
+                        <i class="fa-regular fa-calendar-xmark text-2xl mb-2 block"></i>
+                        Chưa có suất chiếu cho ngày này.
+                    </div>
+
+                    <div th:unless="${#lists.isEmpty(schedule)}"
+                         class="divide-y divide-gray-100 bg-gray-50/30 rounded-lg border border-gray-100 px-5">
+
+                        <div th:each="cinemaSchedule : ${schedule}" class="py-5 space-y-3">
+                            <h4 class="text-xs font-bold text-gray-700" th:text="${cinemaSchedule.cinemaName}">Galaxy Nguyễn Du</h4>
+                            <div th:each="formatGroup : ${cinemaSchedule.formatGroups}"
+                                 class="flex items-start gap-4">
+                                <span class="text-[11px] font-semibold text-gray-400 pt-1.5 w-20 flex-shrink-0"
+                                      th:text="${formatGroup.formatType}">2D Phụ Đề</span>
+                                <div class="flex flex-wrap gap-2">
+                                    <a th:each="slot : ${formatGroup.slots}"
+                                       th:href="@{/dat-ve(showtimeId=${slot.showtimeId})}"
+                                       class="bg-white hover:bg-orange-50 text-xs font-medium text-gray-600 border border-gray-200 hover:border-orange-400 px-4 py-2 rounded shadow-sm transition"
+                                       th:text="${#temporals.format(slot.startTime, 'HH:mm')}">18:15</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="lg:col-span-4 space-y-4">
+                <h3 class="text-sm font-bold text-blue-900 border-l-4 border-blue-700 pl-2 uppercase tracking-wide">Phim Đang Chiếu</h3>
+
+                <div th:if="${#lists.isEmpty(relatedMovies)}"
+                     class="text-xs text-gray-400 py-4 text-center border border-dashed border-gray-200 rounded">
+                    Chưa có phim liên quan.
+                </div>
+
+                <div th:unless="${#lists.isEmpty(relatedMovies)}" class="space-y-4">
+                    <a th:each="related : ${relatedMovies}"
+                       th:href="${related.detailUrl}"
+                       class="flex border border-gray-100 rounded p-2 bg-white hover:shadow-sm transition gap-3">
+                        <div class="w-16 h-24 rounded flex-shrink-0 overflow-hidden bg-gray-200">
+                            <img th:src="${related.posterUrl != null && !#strings.isEmpty(related.posterUrl)} ? ${related.posterUrl} : ${defaultPoster}"
+                                 th:alt="${related.title}"
+                                 class="w-full h-full object-cover">
+                        </div>
+                        <div class="space-y-1 pt-1">
+                            <h4 class="text-xs font-bold text-gray-800 line-clamp-2 hover:text-orange-500 transition"
+                                th:text="${related.title}">Tên phim</h4>
+                            <span th:if="${related.rating != null}"
+                                  th:text="${related.rating}"
+                                  th:class="${related.ratingBadgeClass + ' inline-block text-white font-bold text-[9px] px-1 rounded transform scale-90 origin-left'}">T16</span>
+                            <div th:if="${related.star != null && related.star > 0}"
+                                 class="text-[10px] text-gray-400 flex items-center pt-1">
+                                <i class="fa-solid fa-star text-orange-400 mr-1"></i>
+                                <span class="text-gray-700 font-bold"
+                                      th:text="${#numbers.formatDecimal(related.star, 1, 1)}">9.0</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="pt-2">
+                    <a th:href="@{/phim-dang-chieu}"
+                       class="w-full text-center border border-orange-300 hover:bg-orange-50 text-orange-500 font-semibold text-xs py-2 rounded transition flex items-center justify-center">
+                        Xem thêm <i class="fa-solid fa-chevron-right text-[9px] ml-1.5"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>

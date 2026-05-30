@@ -1,0 +1,147 @@
+
+<main class="container my-5" th:fragment="main">
+    <div th:replace="~{fragments/booking-steps :: bookingSteps('seat')}"></div>
+
+    <div th:if="${booking == null}"
+         class="max-w-3xl mx-auto px-4 py-16 text-center text-gray-500">
+        <i class="fa-solid fa-ticket text-3xl mb-4 text-orange-400"></i>
+        <p class="mb-4">Vui lòng chọn suất chiếu trước khi đặt vé.</p>
+        <a th:href="@{/}" class="text-orange-500 font-semibold hover:underline">Về trang chủ</a>
+    </div>
+
+    <main th:if="${booking != null}"
+          th:with="posterUrl=${booking.posterUrl != null and !#strings.isEmpty(booking.posterUrl) ? booking.posterUrl : defaultPoster}"
+          class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div class="lg:col-span-2 bg-white rounded-lg p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+
+            <div class="flex flex-wrap items-center gap-2 mb-6 pb-4 border-b border-gray-100">
+                <span class="text-gray-600 font-medium text-sm mr-2">Đổi suất chiếu</span>
+                <a th:each="alt : ${booking.alternateShowtimes}"
+                   th:href="@{/dat-ve(showtimeId=${alt.showtimeId})}"
+                   th:text="${#temporals.format(alt.startTime, 'HH:mm')}"
+                   th:class="${alt.showtimeId == booking.showtimeId ? 'px-4 py-1.5 bg-[#034ea1] text-white rounded text-sm font-medium shadow-sm' : 'px-4 py-1.5 border border-gray-200 rounded text-sm text-gray-600 hover:border-blue-500 transition'}">
+                    19:45
+                </a>
+            </div>
+
+            <div id="seat-picker" class="overflow-x-auto seat-scrollbar pb-4">
+                <div class="min-w-[400px] flex flex-col items-center">
+
+                    <div class="w-full space-y-2 mb-8 px-4">
+                        <div th:each="row : ${booking.seatRows}"
+                             class="flex items-center justify-between text-xs text-gray-500 font-medium">
+                            <span th:text="${row.rowChar}">A</span>
+                            <div class="flex space-x-1.5 flex-wrap justify-center gap-y-1">
+                                <button th:each="seat : ${row.seats}"
+                                        type="button"
+                                        class="seat-btn w-7 h-7 flex items-center justify-center border rounded text-[10px] font-medium transition"
+                                        th:data-show-seat-id="${seat.showSeatId}"
+                                        th:data-price="${seat.price}"
+                                        th:text="${seat.seatNumber}"
+                                        th:disabled="${seat.unavailable}"
+                                        th:classappend="${seat.cssClass}">
+                                    1
+                                </button>
+                            </div>
+                            <span th:text="${row.rowChar}">A</span>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(booking.seatRows)}"
+                             class="text-center py-8 text-gray-400 text-sm">
+                            Chưa có ghế cho suất chiếu này.
+                        </div>
+                    </div>
+
+                    <div class="w-full mt-4">
+                        <div class="w-full h-[3px] bg-orange-500 rounded"></div>
+                        <div class="text-center text-xs text-gray-400 mt-2 tracking-widest">Màn hình</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mt-8 pt-4 border-t border-gray-100 grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs text-gray-500">
+                <div class="flex items-center space-x-2">
+                    <span class="w-4 h-4 bg-gray-300 rounded block"></span>
+                    <span>Ghế đã bán</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="w-4 h-4 bg-orange-500 rounded block"></span>
+                    <span>Ghế đang chọn</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="w-4 h-4 border border-yellow-500 rounded bg-white block"></span>
+                    <span>Ghế VIP</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="w-4 h-4 border border-gray-300 rounded bg-white block"></span>
+                    <span>Ghế trống</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bg-white rounded-lg p-5 shadow-sm border border-gray-100 flex flex-col justify-between h-fit border-t-4 border-t-orange-500">
+
+            <div class="flex space-x-4 mb-6">
+                <div class="w-28 h-40 bg-gray-200 rounded overflow-hidden flex-shrink-0 relative shadow-inner">
+                    <img th:src="${posterUrl}" th:alt="${booking.movieTitle}" class="w-full h-full object-cover">
+                </div>
+                <div class="flex flex-col justify-start space-y-2">
+                    <h2 class="text-lg font-bold text-gray-800 leading-tight" th:text="${booking.movieTitle}">Tên phim</h2>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-gray-500 font-medium" th:text="${booking.formatType}">2D Phụ Đề</span>
+                        <span th:if="${booking.rating != null}"
+                              th:text="${booking.rating}"
+                              th:class="${booking.ratingBadgeClass + ' text-white text-[10px] font-bold px-1.5 py-0.5 rounded'}">T16</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-sm text-gray-600 border-b border-dashed border-gray-200 pb-6 mb-6">
+                <div class="flex justify-between">
+                    <span class="font-medium text-gray-800" th:text="${booking.cinemaName}">Galaxy</span>
+                    <span class="text-gray-500" th:text="${booking.roomName}">Phòng 01</span>
+                </div>
+                <div class="flex justify-between flex-wrap gap-2">
+                    <span>Suất:
+                        <strong class="text-gray-800" th:text="${#temporals.format(booking.startTime, 'HH:mm')}">19:45</strong>
+                        -
+                        <span th:text="${#temporals.format(booking.startTime, 'EEEE, dd/MM/yyyy', new java.util.Locale('vi', 'VN'))}">Thứ Bảy, 30/05/2026</span>
+                    </span>
+                </div>
+                <div class="flex justify-between text-xs text-gray-400">
+                    <span>Đã chọn</span>
+                    <span id="booking-seat-count" class="font-medium text-gray-600">0 ghế</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-8">
+                <span class="text-base font-semibold text-gray-800">Tổng cộng</span>
+                <span id="booking-total" class="text-xl font-bold text-orange-500">0 đ</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3">
+                <a th:href="@{/phim/{id}(id=${booking.movieId})}"
+                   class="col-span-1 py-3 border border-orange-500 text-orange-500 rounded font-medium text-center hover:bg-orange-50 transition text-sm">Quay lại</a>
+                <a id="booking-continue"
+                   href="#"
+                   aria-disabled="true"
+                   th:attr="data-showtime-id=${booking.showtimeId}"
+                   class="col-span-2 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded font-medium text-center transition shadow-md text-sm opacity-50 pointer-events-none cursor-not-allowed">
+                    Tiếp tục
+                </a>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script th:if="${booking != null}" th:src="@{/js/seat-picker.js}"></script>
+    <script th:if="${booking != null}" th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            SeatPicker.init(/*[[${booking.showtimeId}]]*/ 0);
+        });
+    </script>
+</main>

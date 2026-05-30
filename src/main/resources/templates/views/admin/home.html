@@ -1,0 +1,209 @@
+<main id="main" class="main" th:fragment="main">
+
+    <div class="pagetitle">
+        <h1>Tổng quan &amp; Thống kê</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/admin}">Admin</a></li>
+                <li class="breadcrumb-item active">Dashboard</li>
+            </ol>
+        </nav>
+    </div>
+
+    <section class="section dashboard">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <a th:href="@{/admin(period='day')}"
+               th:class="${stats.period == 'day'} ? 'btn btn-primary btn-sm' : 'btn btn-outline-primary btn-sm'">Theo ngày</a>
+            <a th:href="@{/admin(period='week')}"
+               th:class="${stats.period == 'week'} ? 'btn btn-primary btn-sm' : 'btn btn-outline-primary btn-sm'">7 ngày</a>
+            <a th:href="@{/admin(period='month')}"
+               th:class="${stats.period == 'month'} ? 'btn btn-primary btn-sm' : 'btn btn-outline-primary btn-sm'">Theo tháng</a>
+        </div>
+
+        <div class="row">
+            <div class="col-xxl-3 col-md-6">
+                <div class="card info-card revenue-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Tổng doanh thu <span>| Đã thanh toán</span></h5>
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="bi bi-currency-exchange"></i>
+                            </div>
+                            <div class="ps-3">
+                                <h6 th:text="${#numbers.formatDecimal(stats.totalRevenue, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</h6>
+                                <span class="text-muted small">Vé + đồ ăn (Paid)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xxl-3 col-md-6">
+                <div class="card info-card sales-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Doanh thu <span th:text="'| ' + ${stats.periodLabel}">| Kỳ</span></h5>
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </div>
+                            <div class="ps-3">
+                                <h6 th:text="${#numbers.formatDecimal(stats.periodRevenue, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xxl-3 col-md-6">
+                <div class="card info-card customers-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Vé đã bán <span>| Paid</span></h5>
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="bi bi-ticket-perforated"></i>
+                            </div>
+                            <div class="ps-3">
+                                <h6 th:text="${stats.ticketsSold}">0</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xxl-3 col-md-6">
+                <div class="card info-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Đơn hàng theo trạng thái</h5>
+                        <p class="mb-1 small">
+                            <span class="badge bg-success">Paid</span>
+                            <strong th:text="${stats.paidBookings}">0</strong>
+                        </p>
+                        <p class="mb-1 small">
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            <strong th:text="${stats.pendingBookings}">0</strong>
+                        </p>
+                        <p class="mb-0 small">
+                            <span class="badge bg-danger">Cancelled</span>
+                            <strong th:text="${stats.cancelledBookings}">0</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Doanh thu <span th:text="'| ' + ${stats.periodLabel}">| Kỳ</span></h5>
+                        <div id="revenueChart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Tỷ lệ đặt vé</h5>
+                        <div id="bookingStatusChart" style="min-height: 280px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Top phim bán chạy</h5>
+                        <table class="table table-sm table-borderless">
+                            <thead>
+                            <tr>
+                                <th>Phim</th>
+                                <th class="text-end">Vé bán</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(stats.topMovies)}">
+                                <td colspan="2" class="text-muted text-center">Chưa có dữ liệu</td>
+                            </tr>
+                            <tr th:each="m : ${stats.topMovies}">
+                                <td th:text="${m.title}">Phim</td>
+                                <td class="text-end fw-bold" th:text="${m.ticketsSold}">0</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Top combo / đồ ăn</h5>
+                        <table class="table table-sm table-borderless">
+                            <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th class="text-end">SL</th>
+                                <th class="text-end">Doanh thu</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(stats.topProducts)}">
+                                <td colspan="3" class="text-muted text-center">Chưa có dữ liệu</td>
+                            </tr>
+                            <tr th:each="p : ${stats.topProducts}">
+                                <td th:text="${p.productName}">Combo</td>
+                                <td class="text-end" th:text="${p.quantitySold}">0</td>
+                                <td class="text-end"
+                                    th:text="${#numbers.formatDecimal(p.revenue, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const revenueLabels = /*[[${stats.revenueChart.![label]}]]*/ [];
+            const revenueAmounts = /*[[${stats.revenueChart.![amount]}]]*/ [];
+            const paid = /*[[${stats.paidBookings}]]*/ 0;
+            const pending = /*[[${stats.pendingBookings}]]*/ 0;
+            const cancelled = /*[[${stats.cancelledBookings}]]*/ 0;
+
+            if (document.querySelector('#revenueChart') && typeof ApexCharts !== 'undefined') {
+                new ApexCharts(document.querySelector('#revenueChart'), {
+                    series: [{ name: 'Doanh thu', data: revenueAmounts.map(Number) }],
+                    chart: { type: 'area', height: 320, toolbar: { show: false } },
+                    colors: ['#4154f1'],
+                    stroke: { curve: 'smooth', width: 2 },
+                    xaxis: { categories: revenueLabels },
+                    yaxis: {
+                        labels: {
+                            formatter: function (v) {
+                                return new Intl.NumberFormat('vi-VN').format(v) + ' đ';
+                            }
+                        }
+                    },
+                    dataLabels: { enabled: false }
+                }).render();
+            }
+
+            if (document.querySelector('#bookingStatusChart') && typeof echarts !== 'undefined') {
+                echarts.init(document.querySelector('#bookingStatusChart')).setOption({
+                    tooltip: { trigger: 'item' },
+                    legend: { bottom: 0 },
+                    series: [{
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        data: [
+                            { value: paid, name: 'Paid' },
+                            { value: pending, name: 'Pending' },
+                            { value: cancelled, name: 'Cancelled' }
+                        ]
+                    }]
+                });
+            }
+        });
+    </script>
+</main>
