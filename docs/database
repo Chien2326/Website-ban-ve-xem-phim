@@ -1,6 +1,7 @@
 CREATE DATABASE banvexemphim CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE banvexemphim;
 
+
 -- 1. Bảng Vai trò (Roles)
 CREATE TABLE Roles (
     role_id INT AUTO_INCREMENT PRIMARY KEY, -- Mã định danh duy nhất cho vai trò

@@ -1,0 +1,59 @@
+<main id="main" class="main" th:fragment="main">
+    <div th:with="pageTitle=${form.showtimeId != null ? 'Sửa suất chiếu' : 'Thêm suất chiếu'}"
+         th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Lịch chiếu', @{/admin/showtimes})}"></div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <p class="text-muted small" th:if="${form.showtimeId == null}">
+                    Khi tạo mới, hệ thống tự sinh ghế (ShowSeats) từ sơ đồ phòng. Giá ghế VIP +25%, Sweetbox +50% so với giá gốc.
+                </p>
+                <form th:action="@{/admin/showtimes/save}" method="post" th:object="${form}">
+                    <input type="hidden" th:field="*{showtimeId}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Phim *</label>
+                            <select class="form-select" th:field="*{movieId}" required>
+                                <option value="">— Chọn phim —</option>
+                                <option th:each="m : ${movies}" th:value="${m.movieId}"
+                                        th:text="${m.title + ' (' + m.duration + ' phút)'}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phòng chiếu *</label>
+                            <select class="form-select" th:field="*{roomId}" required>
+                                <option value="">— Chọn phòng —</option>
+                                <option th:each="r : ${rooms}" th:value="${r.roomId}"
+                                        th:text="${r.cinema.name + ' — ' + r.name + ' (' + r.totalSeats + ' ghế)'}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Giờ bắt đầu *</label>
+                            <input type="datetime-local" class="form-control" th:field="*{startTime}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Giờ kết thúc</label>
+                            <input type="datetime-local" class="form-control" th:field="*{endTime}">
+                            <div class="form-text">Để trống = tự tính theo thời lượng phim</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Giá vé gốc (đ) *</label>
+                            <input type="number" class="form-control" th:field="*{priceBase}" min="0" step="1000" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Định dạng *</label>
+                            <input type="text" class="form-control" th:field="*{formatType}"
+                                   placeholder="2D Phụ Đề, 3D, IMAX...">
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Lưu suất chiếu</button>
+                        <a th:href="@{/admin/showtimes}" class="btn btn-secondary">Hủy</a>
+                        <a th:if="${form.showtimeId != null}"
+                           th:href="@{/admin/showtimes/{id}/seats(id=${form.showtimeId})}"
+                           class="btn btn-outline-info ms-auto">Giám sát ghế</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>

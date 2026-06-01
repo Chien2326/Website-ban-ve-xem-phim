@@ -45,4 +45,14 @@ public interface ShowSeatRepository extends JpaRepository<ShowSeat, Integer> {
     Set<Integer> findOccupiedSeatIds(
             @Param("showtimeId") Integer showtimeId,
             @Param("statuses") List<ShowSeatStatus> statuses);
+
+    long countByShowtimeShowtimeIdAndStatus(Integer showtimeId, ShowSeatStatus status);
+
+    boolean existsByShowtimeShowtimeIdAndStatusIn(Integer showtimeId, List<ShowSeatStatus> statuses);
+
+    @Query("""
+            SELECT COUNT(td) > 0 FROM TicketDetail td
+            WHERE td.showSeat.showtime.showtimeId = :showtimeId
+            """)
+    boolean existsTicketForShowtime(@Param("showtimeId") Integer showtimeId);
 }

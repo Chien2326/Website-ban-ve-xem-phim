@@ -1,21 +1,30 @@
-<main class="main" th:fragment="main">
+<main id="main" class="main" th:fragment="main">
     <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Thể loại phim', 'Quản lý phim', @{/admin})}"></div>
     <section class="section">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Danh mục Genres</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Danh mục Genres</h5>
+                    <a th:href="@{/admin/genres/new}" class="btn btn-primary">Thêm thể loại</a>
+                </div>
                 <p class="text-muted small">Quản lý thể loại phim (Hành động, Tình cảm, Kinh dị...). Gán phim qua bảng MovieGenres.</p>
                 <table class="table table-striped datatable">
                     <thead>
-                    <tr><th>ID</th><th>Tên thể loại</th></tr>
+                    <tr><th>ID</th><th>Tên thể loại</th><th>Hành động</th></tr>
                     </thead>
                     <tbody>
                     <tr th:each="g : ${items}">
                         <td th:text="${g.genreId}">1</td>
                         <td th:text="${g.genreName}">Hành động</td>
+                        <td>
+                            <a th:href="@{/admin/genres/{id}/edit(id=${g.genreId})}" class="btn btn-sm btn-outline-primary" title="Sửa"><i class="bi bi-pencil-square"></i></a>
+                            <form th:action="@{/admin/genres/{id}/delete(id=${g.genreId})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa thể loại này?')"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(items)}">
-                        <td colspan="2" class="text-center text-muted">Chưa có thể loại</td>
+                        <td colspan="3" class="text-center text-muted">Chưa có thể loại</td>
                     </tr>
                     </tbody>
                 </table>

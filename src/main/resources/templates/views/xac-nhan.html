@@ -96,21 +96,28 @@
                     <label class="flex items-start space-x-3 cursor-pointer group">
                         <div class="w-8 h-8 bg-emerald-50 rounded-full flex items-center justify-center flex-shrink-0 border border-emerald-200 mt-0.5">
                             <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944a11.954 11.954 0 007.834 3.056 12.012 12.012 0 01-1.183 5.508 12.01 12.01 0 01-6.184 6.495 12.01 12.01 0 01-6.183-6.495 12.011 12.011 0 01-1.183-5.508zm8.93 2.293a1 1 0 10-1.414-1.414L7 8.586 5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l3-3z" clip-rule="evenodd"></path>
+                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944a11.954 11.954 0 007.834 3.056 12.012 12.012 0 01-1.183 5.508 12.01 12.012 0 01-6.184 6.495 12.01 12.01 0 01-6.183-6.495 12.011 12.011 0 01-1.183-5.508zm8.93 2.293a1 1 0 10-1.414-1.414L7 8.586 5.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l3-3z" clip-rule="evenodd"></path>
                             </svg>
                         </div>
                         <div class="text-[11px] text-gray-500 leading-normal">
                             Tôi xác nhận các thông tin đặt vé đã chính xác.
                             Tôi đồng ý với các <a href="#" class="text-orange-500 font-semibold underline">Điều khoản dịch vụ</a>.
                         </div>
-                        <input type="checkbox" checked class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500 mt-1 flex-shrink-0 accent-orange-500">
+                        <input type="checkbox" checked id="terms-checkbox" class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500 mt-1 flex-shrink-0 accent-orange-500">
                     </label>
 
-                    <button type="button" disabled
-                            class="w-full py-3 bg-gray-300 text-white font-semibold rounded-lg text-sm cursor-not-allowed tracking-wide text-center"
-                            title="Chức năng lưu đơn sẽ được bổ sung">
-                        Thanh Toán (demo)
-                    </button>
+                    <form th:action="@{/payment/initiate}" method="POST" id="payment-form" class="w-full">
+                        <input type="hidden" name="showtimeId" th:value="${checkout.showtimeId}">
+                        <input type="hidden" name="showSeatIds" th:value="${showSeatIds}">
+                        <input type="hidden" name="paymentMethod" th:value="${paymentMethod}">
+                        <input type="hidden" th:each="pid : ${productIds}" name="productIds" th:value="${pid}">
+                        <input type="hidden" th:each="qty : ${quantities}" name="quantities" th:value="${qty}">
+
+                        <button type="submit" id="payment-button"
+                                class="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg text-sm cursor-pointer tracking-wide text-center transition">
+                            Thanh Toán với <span th:text="${paymentMethodLabel}"></span>
+                        </button>
+                    </form>
 
                     <a th:href="${thanhToanUrl}"
                        class="text-xs text-orange-500 font-semibold hover:underline">

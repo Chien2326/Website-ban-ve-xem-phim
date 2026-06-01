@@ -1,13 +1,16 @@
 package hethongwebbanvexemphim.controller;
 
 import hethongwebbanvexemphim.dto.mapper.DtoMapper;
+import hethongwebbanvexemphim.dto.response.MomoPaymentResponse;
 import hethongwebbanvexemphim.entity.enums.PaymentMethod;
 import hethongwebbanvexemphim.repository.RegionRepository;
 import hethongwebbanvexemphim.service.BookingService;
 import hethongwebbanvexemphim.service.HomePageService;
+import hethongwebbanvexemphim.service.MomoPaymentService;
 import hethongwebbanvexemphim.service.MovieDetailService;
 import hethongwebbanvexemphim.service.MovieService;
 import hethongwebbanvexemphim.service.ProductService;
+import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +19,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,6 +33,7 @@ public class HomeController {
     private final ProductService productService;
     private final HomePageService homePageService;
     private final RegionRepository regionRepository;
+    private final MomoPaymentService momoPaymentService;
 
     @GetMapping("/")
     public String home(
@@ -219,5 +225,85 @@ public class HomeController {
         model.addAttribute("regions", DtoMapper.toRegions(regionRepository.findAll()));
         model.addAttribute("selectedRegionId", regionId);
         model.addAttribute("defaultPoster", MovieService.defaultPoster());
+    }
+
+    @PostMapping("/payment/initiate")
+    public RedirectView initiatePayment(
+            @RequestParam Integer showtimeId,
+            @RequestParam String showSeatIds,
+            @RequestParam(required = false) List<Integer> productIds,
+            @RequestParam(required = false) List<Integer> quantities,
+            @RequestParam PaymentMethod paymentMethod,
+            HttpSession session
+    ) {
+        var checkout = bookingService.getCheckoutSummary(
+                showtimeId,
+                BookingService.parseShowSeatIds(showSeatIds),
+                productIds,
+                quantities
+        );
+
+        // Store checkout info in session for later use
+        session.setAttribute("checkout", checkout);
+        session.setAttribute("showtimeId", showtimeId);
+        session.setAttribute("showSeatIds", showSeatIds);
+        session.setAttribute("productIds", productIds);
+        session.setAttribute("quantities", quantities);
+        session.setAttribute("paymentMethod", paymentMethod);
+
+        if (paymentMethod == PaymentMethod.Momo) {
+            Long amount = checkout.getGrandTotal().longValue();
+            String orderInfo = "Thanh toán vé xem phim: " + checkout.getMovieTitle();
+            MomoPaymentResponse response = momoPaymentService.createPayment(amount, orderInfo);
+
+            if (response.getResultCode() == 0) {
+                return new RedirectView(response.getPayUrl());
+            } else {
+                // Handle error
+                return new RedirectView("/payment/failure?message=" + response.getMessage());
+            }
+        }
+
+        // TODO: Add other payment methods (ZaloPay, VNPay, ATM)
+        return new RedirectView("/payment/failure?message=Phương thức thanh toán chưa được hỗ trợ");
+    }
+
+    @GetMapping("/payment/success")
+    public String paymentSuccess(
+            @RequestParam(required = false) String partnerCode,
+            @RequestParam(required = false) String orderId,
+            @RequestParam(required = false) String requestId,
+            @RequestParam(required = false) Long amount,
+            @RequestParam(required = false) String orderInfo,
+            @RequestParam(required = false) String orderType,
+            @RequestParam(required = false) Long transId,
+            @RequestParam(required = false) Integer resultCode,
+            @RequestParam(required = false) String message,
+            @RequestParam(required = false) String payType,
+            @RequestParam(required = false) Long responseTime,
+            @RequestParam(required = false) String extraData,
+            @RequestParam(required = false) String signature,
+            Model model
+    ) {
+        if (resultCode == 0) {
+            model.addAttribute("message", "Thanh toán thành công!");
+            model.addAttribute("orderId", orderId);
+            model.addAttribute("amount", amount);
+            model.addAttribute("content", "views/payment-success");
+        } else {
+            model.addAttribute("message", message);
+            model.addAttribute("content", "views/payment-failure");
+        }
+        return "layouts/layout";
+    }
+
+    @GetMapping("/payment/failure")
+    public String paymentFailure(
+            @RequestParam(required = false) String message,
+            Model model
+    ) {
+        model.addAttribute("message", message != null ? message : "Thanh toán thất bại!");
+        model.addAttribute("content", "views/payment-failure");
+        return "layouts/layout";
     }
 }

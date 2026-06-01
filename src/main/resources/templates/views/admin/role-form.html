@@ -1,0 +1,27 @@
+<main id="main" class="main" th:fragment="main">
+    <div th:with="pageTitle=${form.roleId != null ? 'Sửa vai trò' : 'Thêm vai trò mới'}"
+         th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách vai trò', @{/admin/roles})}"></div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{/admin/roles/save}" method="post" th:object="${form}">
+                    <input type="hidden" th:field="*{roleId}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tên vai trò *</label>
+                            <input type="text" class="form-control" th:field="*{roleName}" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-control" rows="3" th:field="*{description}"></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Lưu vai trò</button>
+                        <a th:href="@{/admin/roles}" class="btn btn-secondary">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>

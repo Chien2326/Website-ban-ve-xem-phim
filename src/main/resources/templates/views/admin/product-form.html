@@ -1,0 +1,47 @@
+<main id="main" class="main" th:fragment="main">
+    <div th:with="pageTitle=${form.productId != null ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới'}"
+         th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách sản phẩm', @{/admin/products})}"></div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{/admin/products/save}" method="post" th:object="${form}">
+                    <input type="hidden" th:field="*{productId}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tên sản phẩm *</label>
+                            <input type="text" class="form-control" th:field="*{productName}" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Giá *</label>
+                            <input type="number" step="0.01" class="form-control" th:field="*{price}" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Loại *</label>
+                            <select class="form-select" th:field="*{productType}" required>
+                                <option th:each="t : ${productTypes}" th:value="${t}" th:text="${t}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select" th:field="*{status}">
+                                <option th:each="s : ${productStatuses}" th:value="${s}" th:text="${s}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-control" rows="3" th:field="*{description}"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">URL hình ảnh</label>
+                            <input type="url" class="form-control" th:field="*{imageUrl}">
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
+                        <a th:href="@{/admin/products}" class="btn btn-secondary">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>

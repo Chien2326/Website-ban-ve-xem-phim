@@ -1,16 +1,26 @@
-<main class="main" th:fragment="main">
+<main id="main" class="main" th:fragment="main">
     <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Cụm rạp', 'Quản lý rạp', @{/admin})}"></div>
     <section class="section">
         <div class="card">
             <div class="card-body table-responsive">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Danh sách rạp</h5>
+                    <a th:href="@{/admin/cinemas/new}" class="btn btn-primary">Thêm rạp</a>
+                </div>
                 <table class="table table-striped">
-                    <thead><tr><th>ID</th><th>Tên rạp</th><th>Khu vực</th><th>Địa chỉ</th></tr></thead>
+                    <thead><tr><th>ID</th><th>Tên rạp</th><th>Khu vực</th><th>Địa chỉ</th><th>Hành động</th></tr></thead>
                     <tbody>
                     <tr th:each="c : ${items}">
                         <td th:text="${c.cinemaId}">1</td>
                         <td th:text="${c.name}">Galaxy</td>
                         <td th:text="${c.region.regionName}">Hà Nội</td>
                         <td th:text="${c.address}">Địa chỉ</td>
+                        <td>
+                            <a th:href="@{/admin/cinemas/{id}/edit(id=${c.cinemaId})}" class="btn btn-sm btn-outline-primary" title="Sửa"><i class="bi bi-pencil-square"></i></a>
+                            <form th:action="@{/admin/cinemas/{id}/delete(id=${c.cinemaId})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa rạp này?')"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
                     </tr>
                     </tbody>
                 </table>

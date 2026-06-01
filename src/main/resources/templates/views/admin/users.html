@@ -1,13 +1,17 @@
-<main class="main" th:fragment="main">
+<main id="main" class="main" th:fragment="main">
     <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Người dùng', 'Hệ thống', @{/admin})}"></div>
     <section class="section">
         <div class="card">
             <div class="card-body table-responsive">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Danh sách người dùng</h5>
+                    <a th:href="@{/admin/users/new}" class="btn btn-primary">Thêm người dùng</a>
+                </div>
                 <p class="text-muted small">Khách hàng &amp; nhân viên: email, SĐT, ngày sinh (ưu đãi), vai trò.</p>
                 <table class="table table-striped">
                     <thead>
                     <tr>
-                        <th>ID</th><th>Họ tên</th><th>Email</th><th>SĐT</th><th>Ngày sinh</th><th>Vai trò</th>
+                        <th>ID</th><th>Họ tên</th><th>Email</th><th>SĐT</th><th>Ngày sinh</th><th>Vai trò</th><th>Hành động</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -17,7 +21,17 @@
                         <td th:text="${u.email}">a@mail.com</td>
                         <td th:text="${u.phone}">09x</td>
                         <td th:text="${u.birthday != null ? #temporals.format(u.birthday, 'dd/MM/yyyy') : '—'}">—</td>
-                        <td th:text="${u.role.roleName}">CUSTOMER</td>
+                        <td>
+                            <span th:if="${u.role.roleName == 'ADMIN'}" class="badge bg-danger" th:text="${u.role.roleName}">ADMIN</span>
+                            <span th:if="${u.role.roleName == 'STAFF'}" class="badge bg-warning text-dark" th:text="${u.role.roleName}">STAFF</span>
+                            <span th:if="${u.role.roleName == 'CUSTOMER'}" class="badge bg-secondary" th:text="${u.role.roleName}">CUSTOMER</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/admin/users/{id}/edit(id=${u.userId})}" class="btn btn-sm btn-outline-primary" title="Sửa"><i class="bi bi-pencil-square"></i></a>
+                            <form th:action="@{/admin/users/{id}/delete(id=${u.userId})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa người dùng này?')"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
                     </tr>
                     </tbody>
                 </table>

@@ -1,0 +1,16 @@
+<main class="container my-10" th:fragment="main">
+    <div class="max-w-2xl mx-auto px-4 py-16 text-center">
+        <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8">
+            <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Thanh toán thành công!</h1>
+        <p class="text-gray-600 mb-2" th:text="${message}">Cảm ơn bạn đã đặt vé xem phim!</p>
+        <p class="text-sm text-gray-500 mb-6" th:if="${orderId != null}">Mã đơn hàng: <span class="font-semibold text-gray-800" th:text="${orderId}"></span></p>
+        <p class="text-lg text-gray-700 mb-8" th:if="${amount != null}">Tổng tiền: <span class="font-bold text-orange-500" th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span></p>
+        <a th:href="@{/}" class="inline-flex items-center justify-center px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition">
+            Về trang chủ
+        </a>
+    </div>
+</main>

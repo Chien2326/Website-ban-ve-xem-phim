@@ -1,0 +1,59 @@
+├── 📊 Dashboard (Tổng quan & Thống kê)
+├── 🎬 Quản Lý Phim
+│   ├── Thể Loại Phim
+│   ├── Danh Sách Phim
+│   └── Lịch Chiếu (Showtimes)
+├── 🏢 Quản Lý Rạp
+│   ├── Tỉnh / Thành Phố
+│   ├── Cụm Rạp (Cinemas)
+│   └── Phòng Chiếu & Sơ Đồ Ghế
+├── 🎟️ Quản Lý Đơn Hàng (Bookings)
+│   ├── Danh Sách Đơn Hàng
+│   └── Tra Cứu Vé Lẻ
+├── 🍿 Quản Lý Bắp Nước (Products)
+│   └── Danh Sách Combo / Đồ Ăn
+└── 👥 Quản Lý Hệ Thống
+    ├── Danh Sách Người Dùng
+    └── Phân Quyền (Roles)
+
+
+
+1. Tổng quan & Thống kê (Dashboard):
+    - Đây là trang đầu tiên admin nhìn thấy khi đăng nhập, dựa trên dữ liệu tổng hợp từ các bảng Bookings, Ticket_Details, và BookingProducts.
+    - Báo cáo doanh thu: Tổng doanh thu (vé + đồ ăn), doanh thu theo ngày/tuần/tháng.Thống kê tỷ lệ đặt vé: Số lượng vé đã bán (Paid), số lượng đơn bị hủy (Cancelled), hoặc đang chờ (Pending).
+    - Top phim ăn khách: Phim có số lượng vé bán ra nhiều nhất (Join Movies, Showtimes, ShowSeats).Top sản phẩm chạy nhất: Combo bắp nước được mua nhiều nhất (Từ BookingProducts).
+2. Quản lý Phim & Lịch chiếu (Movie Management):
+    - Phân hệ này trực tiếp thao tác với các bảng: Movies, Genres, MovieGenres, và Showtimes.
+    - Quản lý Thể loại (Genres): Danh mục thể loại (Hành động, Tình cảm, Kinh dị...).
+    - Quản lý Phim (Movies):
+        + Thêm phim mới (Tải lên poster, chèn link trailer, nhập thời lượng, phân loại độ tuổi như T13, T18...).
+        + Cập nhật trạng thái phim (COMING_SOON, NOW_SHOWING, ENDED).
+        + Gán thể loại cho phim (MovieGenres).
+    - Quản lý Suất chiếu (Showtimes):
+        + Sắp xếp lịch chiếu: Chọn phim -> Chọn cụm rạp -> Chọn phòng -> Chọn giờ chiếu (start_time, end_time).
+        + Cài đặt giá vé gốc (price_base) cho từng suất chiếu (Ví dụ: Suất tối/cuối tuần giá cao hơn ban ngày).
+        + Cài đặt định dạng (format_type: 2D, 3D, IMAX).
+3. Quản lý Hệ thống Rạp (Cinema & Room Management):
+    - Phân hệ cấu hình hạ tầng phần cứng của rạp, thao tác với các bảng: Regions, Cinemas, Rooms, và Seats.
+    - Quản lý Tỉnh/Thành phố (Regions): Thêm/sửa/xóa các khu vực (Hà Nội, TP.HCM, Đà Nẵng...).
+    - Quản lý Cụm rạp (Cinemas): Thêm chi nhánh rạp mới vào từng khu vực, cập nhật địa chỉ.
+    - Quản lý Phòng chiếu (Rooms): Tạo các phòng chiếu thuộc cụm rạp, quản lý tổng số ghế (total_seats).
+    - Sơ đồ ghế ngồi (Seats): * Thiết kế sơ đồ ghế cho từng phòng (Hàng A, B, C... Ghế số 1, 2, 3...).Phân loại loại ghế để cấu hình phụ thu (Standard, VIP, Sweetbox).
+4. Quản lý Bán hàng & Đơn hàng (Sales & Bookings):
+    - Phân hệ vận hành trực tiếp, xử lý dữ liệu từ: Bookings, Ticket_Details, và ShowSeats.
+    - Quản lý Đơn hàng (Bookings):
+        + Danh sách tất cả các giao dịch đặt vé trên hệ thống.
+        + Bộ lọc tìm kiếm theo: Mã đơn hàng, Số điện thoại khách hàng, Trạng thái (Pending, Paid, Cancelled), Phương thức thanh toán.
+        + Tính năng Hủy đơn hàng hoặc Xác nhận thanh toán thủ công (nếu cần).Chi tiết vé bán (Ticket_Details):
+            Xem chi tiết trong một đơn hàng gồm những ghế nào, giá thực tế bao nhiêu (price_actual).
+            Giám sát trạng thái ghế (ShowSeats): Xem trực quan sơ đồ ghế của một suất chiếu cụ thể xem ghế nào đang trống (Available), ghế nào đang giữ Held hoặc đã bán Booked (Dùng để hỗ trợ khách tại quầy).
+5. Quản lý Dịch vụ Bắp Nước (F&B / Products):
+    - Phân hệ quản lý nguồn thu phụ ngoài vé, thao tác với các bảng: Products và BookingProducts.
+    - Danh mục sản phẩm (Products):Thêm mới đồ ăn, thức uống, hoặc các gói Combo (Bắp + Nước).
+    - Cài đặt giá bán (price), hình ảnh, và mô tả.
+    - Cập nhật trạng thái sản phẩm (AVAILABLE, OUT_OF_STOCK, HIDDEN - ẩn đi khi không bán nữa).
+    - Thống kê tiêu thụ: Xem số lượng sản phẩm đã bán kèm theo các đơn hàng.
+6. Quản lý Người dùng & Phân quyền (Users & Security):
+    - Phân hệ bảo mật và quản lý tệp khách hàng, thao tác với các bảng: Users và Roles.
+    - Quản lý Khách hàng: * Danh sách tài khoản người dùng đã đăng ký.Xem lịch sử đặt vé của từng khách hàng (để chăm sóc khách hàng thân thiết).Kiểm tra thông tin ngày sinh (birthday) phục vụ gửi ưu đãi.
+    - Phân quyền (Roles):Tạo tài khoản Gán vai trò thích hợp (role_id) để giới hạn quyền truy cập

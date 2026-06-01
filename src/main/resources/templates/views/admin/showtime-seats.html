@@ -1,0 +1,82 @@
+<main id="main" class="main" th:fragment="main" th:with="m=${monitor}">
+    <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Giám sát ghế', 'Lịch chiếu', @{/admin/showtimes})}"></div>
+
+    <style>
+        .admin-seat-grid .seat-cell {
+            width: 2rem;
+            height: 2rem;
+            font-size: 0.65rem;
+            border-width: 2px;
+            border-style: solid;
+            border-radius: 0.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.125rem;
+            cursor: default;
+        }
+        .admin-seat-available { background: #fff; border-color: #9ca3af; color: #374151; }
+        .admin-seat-vip { background: #fffbeb; border-color: #eab308; color: #854d0e; }
+        .admin-seat-held { background: #ffedd5; border-color: #f97316; color: #9a3412; font-weight: 600; }
+        .admin-seat-booked { background: #e5e7eb; border-color: #9ca3af; color: #6b7280; }
+        .admin-seat-screen { height: 4px; background: #f97316; border-radius: 2px; }
+    </style>
+
+    <section class="section">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title mb-1" th:text="${m.movieTitle}">Phim</h5>
+                <p class="text-muted small mb-2">
+                    <span th:text="${m.cinemaName}">Rạp</span> ·
+                    <span th:text="${m.roomName}">Phòng</span> ·
+                    <span th:text="${#temporals.format(m.startTime, 'dd/MM/yyyy HH:mm')}">Giờ</span> ·
+                    <span th:text="${m.formatType}">2D</span>
+                </p>
+                <div class="d-flex flex-wrap gap-3 small">
+                    <span><span class="badge bg-light text-dark border">Trống</span> <strong th:text="${m.availableCount}">0</strong></span>
+                    <span><span class="badge bg-warning text-dark">Đang giữ</span> <strong th:text="${m.heldCount}">0</strong></span>
+                    <span><span class="badge bg-secondary">Đã bán</span> <strong th:text="${m.bookedCount}">0</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body overflow-auto">
+                <div class="admin-seat-grid mx-auto" style="max-width: 720px;">
+                    <div th:each="row : ${m.seatRows}" class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-bold" style="width: 1.5rem;" th:text="${row.rowChar}">A</span>
+                        <div class="flex-grow-1 text-center">
+                            <div th:each="seat : ${row.seats}" class="d-inline-block text-center" style="vertical-align: top;">
+                                <span th:class="${'seat-cell ' + seat.cssClass}"
+                                      th:text="${seat.seatLabel.substring(1)}"
+                                      th:title="${seat.seatLabel + ' — ' + seat.statusLabel + ' — ' + #numbers.formatDecimal(seat.price, 0, 'COMMA', 0, 'POINT') + ' đ'}">1</span>
+                                <form th:action="@{/admin/showtimes/{sid}/seats/{ssid}/status(sid=${m.showtimeId}, ssid=${seat.showSeatId})}"
+                                      method="post" class="mt-1">
+                                    <select name="status" class="form-select form-select-sm" style="width: 4.5rem; font-size: 0.6rem; padding: 0.1rem;"
+                                            onchange="this.form.submit()">
+                                        <option th:each="st : ${seatStatuses}" th:value="${st.name()}"
+                                                th:text="${st.name()}"
+                                                th:selected="${st == seat.status}"></option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                        <span class="text-muted small fw-bold" style="width: 1.5rem;" th:text="${row.rowChar}">A</span>
+                    </div>
+                    <div th:if="${#lists.isEmpty(m.seatRows)}" class="text-center text-muted py-4">
+                        Chưa có ghế cho suất này. Hãy tạo lại suất chiếu hoặc kiểm tra sơ đồ phòng.
+                    </div>
+                    <div class="mt-6 text-center">
+                        <div class="admin-seat-screen mx-auto" style="max-width: 90%;"></div>
+                        <div class="text-muted small mt-2 tracking-widest">MÀN HÌNH</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a th:href="@{/admin/showtimes}" class="btn btn-secondary btn-sm">← Danh sách suất</a>
+            <a th:href="@{/admin/showtimes/{id}/edit(id=${m.showtimeId})}" class="btn btn-outline-primary btn-sm">Sửa suất</a>
+        </div>
+    </section>
+</main>

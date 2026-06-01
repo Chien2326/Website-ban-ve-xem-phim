@@ -1,0 +1,40 @@
+<main id="main" class="main" th:fragment="main">
+    <div th:with="pageTitle=${form.seatId != null ? 'Sửa ghế' : 'Thêm ghế mới'}"
+         th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách phòng', @{/admin/rooms})}"></div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{/admin/seats/save}" method="post" th:object="${form}">
+                    <input type="hidden" th:field="*{seatId}">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Phòng *</label>
+                            <select class="form-select" th:field="*{roomId}" required>
+                                <option value="">Chọn phòng</option>
+                                <option th:each="r : ${rooms}" th:value="${r.roomId}" th:text="${r.name}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Hàng *</label>
+                            <input type="text" class="form-control" th:field="*{rowChar}" maxlength="1" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Số ghế *</label>
+                            <input type="number" class="form-control" th:field="*{seatNumber}" min="1" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Loại ghế *</label>
+                            <select class="form-select" th:field="*{seatType}" required>
+                                <option th:each="t : ${seatTypes}" th:value="${t}" th:text="${t}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Lưu ghế</button>
+                        <a th:href="@{/admin/rooms}" class="btn btn-secondary">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>

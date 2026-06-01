@@ -3,14 +3,28 @@
     <section class="section">
         <div class="card">
             <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Danh sách vai trò</h5>
+                    <a th:href="@{/admin/roles/new}" class="btn btn-primary">Thêm vai trò</a>
+                </div>
                 <p class="text-muted small">ADMIN, CUSTOMER, nhân viên bán vé... — giới hạn quyền truy cập module.</p>
                 <table class="table table-striped">
-                    <thead><tr><th>ID</th><th>Tên vai trò</th><th>Mô tả</th></tr></thead>
+                    <thead><tr><th>ID</th><th>Tên vai trò</th><th>Mô tả</th><th>Hành động</th></tr></thead>
                     <tbody>
                     <tr th:each="r : ${items}">
                         <td th:text="${r.roleId}">1</td>
-                        <td th:text="${r.roleName}">ADMIN</td>
+                        <td>
+                            <span th:if="${r.roleName == 'ADMIN'}" class="badge bg-danger" th:text="${r.roleName}">ADMIN</span>
+                            <span th:if="${r.roleName == 'STAFF'}" class="badge bg-warning text-dark" th:text="${r.roleName}">STAFF</span>
+                            <span th:if="${r.roleName == 'CUSTOMER'}" class="badge bg-secondary" th:text="${r.roleName}">CUSTOMER</span>
+                        </td>
                         <td th:text="${r.description}">Mô tả</td>
+                        <td>
+                            <a th:href="@{/admin/roles/{id}/edit(id=${r.roleId})}" class="btn btn-sm btn-outline-primary" title="Sửa"><i class="bi bi-pencil-square"></i></a>
+                            <form th:action="@{/admin/roles/{id}/delete(id=${r.roleId})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa vai trò này?')"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
                     </tr>
                     </tbody>
                 </table>

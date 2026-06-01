@@ -1,0 +1,23 @@
+<main id="main" class="main" th:fragment="main">
+    <div th:with="pageTitle=${form.genreId != null ? 'Sửa thể loại' : 'Thêm thể loại mới'}"
+         th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách thể loại', @{/admin/genres})}"></div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{/admin/genres/save}" method="post" th:object="${form}">
+                    <input type="hidden" th:field="*{genreId}">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Tên thể loại *</label>
+                            <input type="text" class="form-control" th:field="*{genreName}" required>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Lưu thể loại</button>
+                        <a th:href="@{/admin/genres}" class="btn btn-secondary">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>

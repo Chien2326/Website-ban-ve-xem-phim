@@ -9,6 +9,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface MovieGenreRepository extends JpaRepository<MovieGenre, MovieGenreId> {
 
+    List<MovieGenre> findByMovieId(Integer movieId);
+
+    void deleteByMovieId(Integer movieId);
+
     @Query("""
             SELECT g.genreName FROM MovieGenre mg
             JOIN mg.genre g

@@ -1,4 +1,4 @@
-<main class="main" th:fragment="main">
+<main id="main" class="main" th:fragment="main">
     <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Danh sách đơn hàng', 'Quản lý đơn hàng', @{/admin})}"></div>
     <section class="section">
         <div class="card mb-3">
@@ -9,11 +9,11 @@
                             <option value="">Tất cả trạng thái</option>
                             <option th:each="s : ${T(hethongwebbanvexemphim.entity.enums.BookingStatus).values()}"
                                     th:value="${s.name()}" th:text="${s.name()}"
-                                    th:selected="${filterStatus != null and filterStatus.name() == s.name()}"></option>
+                                    th:selected="${filterStatus != null && filterStatus.name() == s.name()}"></option>
                         </select>
                     </div>
                     <div class="col-md-5">
-                        <input type="text" name="keyword" class="form-control form-control-sm"
+                        <input type="text" name="keyword" class="form-control form-select-sm"
                                placeholder="Mã đơn, SĐT, tên khách..."
                                th:value="${filterKeyword}">
                     </div>
@@ -47,11 +47,11 @@
                         <td class="text-nowrap">
                             <form th:action="@{/admin/bookings/{id}/status(id=${b.bookingId})}" method="post" class="d-inline">
                                 <input type="hidden" name="status" value="Paid">
-                                <button type="submit" class="btn btn-outline-success btn-sm" title="Xác nhận thanh toán">Paid</button>
+                                <button type="submit" class="btn btn-outline-success btn-sm" title="Xác nhận thanh toán"><i class="bi bi-check-lg"></i></button>
                             </form>
                             <form th:action="@{/admin/bookings/{id}/status(id=${b.bookingId})}" method="post" class="d-inline">
                                 <input type="hidden" name="status" value="Cancelled">
-                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Hủy đơn">Hủy</button>
+                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Hủy đơn"><i class="bi bi-x-lg"></i></button>
                             </form>
                         </td>
                     </tr>

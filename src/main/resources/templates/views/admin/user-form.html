@@ -1,0 +1,53 @@
+<main id="main" class="main" th:fragment="main">
+    <div th:with="pageTitle=${form.userId != null ? 'Sửa người dùng' : 'Thêm người dùng mới'}"
+         th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách người dùng', @{/admin/users})}"></div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{/admin/users/save}" method="post" th:object="${form}">
+                    <input type="hidden" th:field="*{userId}">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Vai trò *</label>
+                            <select class="form-select" th:field="*{roleId}" required>
+                                <option value="">Chọn vai trò</option>
+                                <option th:each="r : ${roles}" th:value="${r.roleId}" th:text="${r.roleName}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Họ tên *</label>
+                            <input type="text" class="form-control" th:field="*{fullName}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" th:field="*{email}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Số điện thoại *</label>
+                            <input type="text" class="form-control" th:field="*{phone}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Giới tính</label>
+                            <select class="form-select" th:field="*{gender}">
+                                <option value="">—</option>
+                                <option th:each="g : ${genders}" th:value="${g}" th:text="${g}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Ngày sinh</label>
+                            <input type="date" class="form-control" th:field="*{birthday}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" th:text="${form.userId != null ? 'Mật khẩu (để trống nếu không đổi' : 'Mật khẩu *'}">Mật khẩu *</label>
+                            <input type="password" class="form-control" th:field="*{password}" th:required="${form.userId == null}">
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Lưu người dùng</button>
+                        <a th:href="@{/admin/users}" class="btn btn-secondary">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
