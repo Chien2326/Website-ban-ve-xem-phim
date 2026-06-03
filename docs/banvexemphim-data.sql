@@ -32,17 +32,13 @@ VALUES
 -- 3. Users
 -- =========================================================
 
-INSERT INTO Users
-(role_id, full_name, email, phone, gender, birthday, password_hash)
-VALUES
-    (1, 'Nguyễn Văn Admin', 'admin@galaxycine.vn', '0909000001', 'MALE', '1995-05-10', 'hashed_admin_password'),
-
-    (2, 'Trần Minh Hoàng', 'hoang@gmail.com', '0909000002', 'MALE', '2004-03-12', 'hashed_password_1'),
-
-    (2, 'Lê Ngọc Anh', 'ngocanh@gmail.com', '0909000003', 'FEMALE', '2002-11-20', 'hashed_password_2'),
-
-    (2, 'Phạm Quốc Bảo', 'quocbao@gmail.com', '0909000004', 'MALE', '1999-07-15', 'hashed_password_3');
-
+INSERT INTO Users (role_id, full_name, email, phone, gender, birthday, password_hash) VALUES
+-- Admin
+(1, 'Nguyễn Văn Admin', 'admin@gmail.com', '0909000001', 'MALE', '1995-05-10', SHA2('Admin@123', 256)),
+-- Customers
+(2, 'Trần Minh Hoàng', 'tranminhhoang@gmail.com', '0909000002', 'MALE', '2004-03-12', SHA2('Hoang@123', 256)),
+(2, 'Lê Ngọc Anh', 'lengocanh@gmail.com', '0909000003', 'FEMALE', '2002-11-20', SHA2('Anh@123', 256)),
+(2, 'Phạm Quốc Bảo', 'phamquocbao@gmail.com', '0909000004', 'MALE', '1999-07-15', SHA2('Bao@123', 256));
 
 -- =========================================================
 -- 4. Movies
@@ -534,8 +530,8 @@ VALUES
     (
         1,
         1,
-        '2026-06-01 18:00:00',
-        '2026-06-01 20:16:00',
+        '2026-06-04 18:00:00',
+        '2026-06-04 20:16:00',
         '2D Phụ Đề',
         90000
     ),
@@ -543,8 +539,8 @@ VALUES
     (
         2,
         2,
-        '2026-06-01 19:00:00',
-        '2026-06-01 20:39:00',
+        '2026-06-05 19:00:00',
+        '2026-06-05 20:39:00',
         'IMAX Laser',
         150000
     ),
@@ -552,8 +548,8 @@ VALUES
     (
         3,
         3,
-        '2026-06-02 20:00:00',
-        '2026-06-02 22:00:00',
+        '2026-06-06 20:00:00',
+        '2026-06-06 22:00:00',
         '2D Phụ Đề',
         100000
     ),
@@ -561,8 +557,8 @@ VALUES
     (
         4,
         1,
-        '2026-06-02 13:45:00',
-        '2026-06-02 16:05:00',
+        '2026-06-04 13:45:00',
+        '2026-06-04 16:05:00',
         '2D Phụ Đề',
         85000
     ),
@@ -570,8 +566,8 @@ VALUES
     (
         1,
         1,
-        '2026-06-03 14:00:00',
-        '2026-06-03 16:16:00',
+        '2026-06-05 14:00:00',
+        '2026-06-05 16:16:00',
         '2D Phụ Đề',
         90000
     ),
@@ -579,8 +575,8 @@ VALUES
     (
         5,
         2,
-        '2026-06-03 21:00:00',
-        '2026-06-03 22:50:00',
+        '2026-06-07 21:00:00',
+        '2026-06-07 22:50:00',
         '2D Phụ Đề',
         95000
     );
@@ -997,4 +993,11 @@ VALUES
         55000,
         'FOOD'
     );
+    
+    
+    
+    
+	UPDATE Showtimes SET 
+    start_time = DATE_ADD(CURDATE(), INTERVAL (showtime_id % 7 + 1) DAY) + INTERVAL (10 + showtime_id * 2) HOUR,
+    end_time = DATE_ADD(CURDATE(), INTERVAL (showtime_id % 7 + 1) DAY) + INTERVAL (10 + showtime_id * 2 + 2) HOUR;
 

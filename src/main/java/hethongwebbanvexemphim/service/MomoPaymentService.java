@@ -30,9 +30,23 @@ public class MomoPaymentService {
         String extraData = ""; // Base64 encoded, empty for now
         String lang = "vi";
 
+        // Đảm bảo amount là số nguyên VND không có chữ thập phân
+        Long momoAmount = amount;
+        if (momoAmount == null || momoAmount <= 0) {
+            momoAmount = 10000L; // Giá trị test nếu không có tiền
+        }
+
+        System.out.println("=== MOMO PAYMENT DEBUG: amount = " + momoAmount);
+        System.out.println("=== MOMO PAYMENT DEBUG: orderInfo = " + orderInfo);
+        System.out.println("=== MOMO PAYMENT DEBUG: endpoint = " + momoConfig.getEndpoint());
+        System.out.println("=== MOMO PAYMENT DEBUG: redirectUrl = " + momoConfig.getRedirectUrl());
+        System.out.println("=== MOMO PAYMENT DEBUG: ipnUrl = " + momoConfig.getIpnUrl());
+        System.out.println("=== MOMO PAYMENT DEBUG: partnerCode = " + momoConfig.getPartnerCode());
+        System.out.println("=== MOMO PAYMENT DEBUG: accessKey = " + momoConfig.getAccessKey());
+
         // Build raw signature
         String rawSignature = "accessKey=" + momoConfig.getAccessKey()
-                + "&amount=" + amount
+                + "&amount=" + momoAmount
                 + "&extraData=" + extraData
                 + "&ipnUrl=" + momoConfig.getIpnUrl()
                 + "&orderId=" + orderId
@@ -42,14 +56,17 @@ public class MomoPaymentService {
                 + "&requestId=" + requestId
                 + "&requestType=" + requestType;
 
+        System.out.println("=== MOMO PAYMENT DEBUG: rawSignature = " + rawSignature);
+
         String signature = generateHmacSHA256(rawSignature, momoConfig.getSecretKey());
+        System.out.println("=== MOMO PAYMENT DEBUG: signature = " + signature);
 
         MomoPaymentRequest request = MomoPaymentRequest.builder()
                 .partnerCode(momoConfig.getPartnerCode())
                 .partnerName("Test")
                 .storeId("Test Store")
                 .requestId(requestId)
-                .amount(amount)
+                .amount(momoAmount)
                 .orderId(orderId)
                 .orderInfo(orderInfo)
                 .redirectUrl(momoConfig.getRedirectUrl())

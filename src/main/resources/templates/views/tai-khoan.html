@@ -11,7 +11,7 @@
                             <i class="fa-regular fa-image text-2xl group-hover:opacity-0 transition"></i>
                         </div>
                         <h3 class="text-gray-700 font-bold text-sm mt-3 flex items-center">
-                            Nguyễn Văn Chiến
+                            <span th:text="${user?.fullName} ?: 'Nguyễn Văn Chiến'">Nguyễn Văn Chiến</span>
                             <i class="fa-solid fa-medal text-yellow-500 text-xs ml-1.5"></i>
                         </h3>
                         <span class="text-[11px] text-gray-400 font-medium mt-1 uppercase tracking-wider">Star</span>
@@ -128,14 +128,14 @@
                                 <label class="text-gray-500 font-medium">Họ và tên</label>
                                 <div class="relative">
                                     <i class="fa-regular fa-user absolute left-3 top-3 text-gray-400"></i>
-                                    <input type="text" value="Nguyễn Văn Chiến" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
+                                    <input type="text" th:value="${user?.fullName} ?: 'Nguyễn Văn Chiến'" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
                                 </div>
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-gray-500 font-medium">Ngày sinh</label>
                                 <div class="relative">
                                     <i class="fa-regular fa-calendar absolute left-3 top-3 text-gray-400"></i>
-                                    <input type="text" value="29/11/2005" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
+                                    <input type="text" th:value="${user?.birthday != null ? #temporals.format(user.birthday, 'dd/MM/yyyy') : 'Chưa cập nhật'}" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
                                 </div>
                             </div>
                             <div class="space-y-1.5">
@@ -145,14 +145,14 @@
                                 </div>
                                 <div class="relative">
                                     <i class="fa-regular fa-envelope absolute left-3 top-3 text-gray-400"></i>
-                                    <input type="email" value="nguyenvanchiencity@gmail.com" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
+                                    <input type="email" th:value="${user?.email} ?: 'nguyenvanchiencity@gmail.com'" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
                                 </div>
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-gray-500 font-medium">Số điện thoại</label>
                                 <div class="relative">
                                     <i class="fa-solid fa-mobile-screen-button absolute left-3 top-3 text-gray-400"></i>
-                                    <input type="text" value="0365675128" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
+                                    <input type="text" th:value="${user?.phone} ?: '0365675128'" disabled class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium">
                                 </div>
                             </div>
                             <div class="space-y-1.5 md:col-span-2">
@@ -169,12 +169,16 @@
 
                         <div class="flex items-center space-x-6 text-xs font-medium text-gray-600 pt-1">
                             <label class="flex items-center space-x-2 cursor-pointer">
-                                <input type="radio" name="gender" checked class="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-400">
+                                <input type="radio" name="gender" th:checked="${user?.gender?.name() == 'MALE'}" class="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-400">
                                 <span>Nam</span>
                             </label>
                             <label class="flex items-center space-x-2 cursor-pointer">
-                                <input type="radio" name="gender" class="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-400">
+                                <input type="radio" name="gender" th:checked="${user?.gender?.name() == 'FEMALE'}" class="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-400">
                                 <span>Nữ</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="gender" th:checked="${user?.gender?.name() == 'OTHER'}" class="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-400">
+                                <span>Khác</span>
                             </label>
                         </div>
 

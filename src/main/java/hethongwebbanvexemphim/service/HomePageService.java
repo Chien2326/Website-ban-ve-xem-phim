@@ -43,13 +43,29 @@ public class HomePageService {
 
     @Transactional(readOnly = true)
     public List<ShowtimeDto> getBookingShowtimes(Integer regionId) {
-        return DtoMapper.toShowtimes(getUpcomingShowtimes(regionId));
+        var showtimes = getUpcomingShowtimes(regionId);
+        System.out.println("=== DEBUG HomePageService ===");
+        System.out.println("Found showtimes: " + showtimes.size());
+        showtimes.forEach(s -> System.out.println(" - " + s.getShowtimeId() + " : " + s.getStartTime()));
+        return DtoMapper.toShowtimes(showtimes);
     }
 
     private List<Showtime> getUpcomingShowtimes(Integer regionId) {
-        return showtimeRepository.findUpcoming(
-                LocalDateTime.now(),
-                regionId,
-                PageRequest.of(0, UPCOMING_SHOWTIME_LIMIT));
+        System.out.println("=== getUpcomingShowtimes called with regionId: " + regionId + " and now: " + LocalDateTime.now());
+        // Dùng findAllForAdmin() để đảm bảo nạp đầy đủ các quan hệ (movie, room, cinema)
+        var allShowtimes = showtimeRepository.findAllForAdmin();
+        System.out.println("findAllForAdmin returned: " + allShowtimes.size() + " showtimes");
+        
+        // Lọc các suất chiếu có startTime >= now
+        var now = LocalDateTime.now();
+        var filtered = allShowtimes.stream()
+                .filter(st -> !st.getStartTime().isBefore(now))
+                .limit(UPCOMING_SHOWTIME_LIMIT)
+                .toList();
+        
+        System.out.println("After filtering by time: " + filtered.size() + " showtimes");
+        filtered.forEach(st -> System.out.println(" - Showtime " + st.getShowtimeId() + ": " + st.getStartTime() + ", Movie: " + (st.getMovie() != null ? st.getMovie().getTitle() : "NULL")));
+        
+        return filtered;
     }
 }

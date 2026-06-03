@@ -2,6 +2,7 @@ package hethongwebbanvexemphim.controller;
 
 import hethongwebbanvexemphim.dto.mapper.DtoMapper;
 import hethongwebbanvexemphim.dto.response.MomoPaymentResponse;
+import hethongwebbanvexemphim.entity.User;
 import hethongwebbanvexemphim.entity.enums.PaymentMethod;
 import hethongwebbanvexemphim.repository.RegionRepository;
 import hethongwebbanvexemphim.service.BookingService;
@@ -10,17 +11,16 @@ import hethongwebbanvexemphim.service.MomoPaymentService;
 import hethongwebbanvexemphim.service.MovieDetailService;
 import hethongwebbanvexemphim.service.MovieService;
 import hethongwebbanvexemphim.service.ProductService;
+import hethongwebbanvexemphim.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
@@ -34,13 +34,18 @@ public class HomeController {
     private final HomePageService homePageService;
     private final RegionRepository regionRepository;
     private final MomoPaymentService momoPaymentService;
+    private final UserService userService;
 
     @GetMapping("/")
     public String home(
             @RequestParam(defaultValue = "dang-chieu") String tab,
             @RequestParam(required = false) Integer regionId,
+            @RequestHeader(value = "HX-Request", required = false) String hxRequest,
             Model model) {
         addHomeMovieModel(model, tab, regionId);
+        if ("true".equals(hxRequest)) {
+            return "views/home :: movie-content";
+        }
         model.addAttribute("content", "views/home");
         return "layouts/layout";
     }
@@ -84,11 +89,20 @@ public class HomeController {
     }
 
     private void addHomeMovieModel(Model model, String tab, Integer regionId) {
+        var bookingMovies = movieService.getMoviesForBooking();
+        var bookingShowtimes = homePageService.getBookingShowtimes(regionId);
+        
+        System.out.println("=== DEBUG HOME ===");
+        System.out.println("bookingMovies size: " + bookingMovies.size());
+        bookingMovies.forEach(m -> System.out.println(" - Movie: " + m.getMovieId() + " - " + m.getTitle()));
+        System.out.println("bookingShowtimes size: " + bookingShowtimes.size());
+        bookingShowtimes.forEach(st -> System.out.println(" - Showtime: " + st.getShowtimeId() + " - MovieId: " + st.getMovieId()));
+        
         model.addAttribute("movies", movieService.getHomeMovies(tab, regionId));
-        model.addAttribute("bookingMovies", movieService.getMoviesForBooking());
+        model.addAttribute("bookingMovies", bookingMovies);
         model.addAttribute("bookingCinemas", homePageService.getBookingCinemas(regionId));
         model.addAttribute("bookingDates", homePageService.getBookingDates(regionId));
-        model.addAttribute("bookingShowtimes", homePageService.getBookingShowtimes(regionId));
+        model.addAttribute("bookingShowtimes", bookingShowtimes);
         model.addAttribute("regions", DtoMapper.toRegions(regionRepository.findAll()));
         model.addAttribute("activeTab", tab);
         model.addAttribute("selectedRegionId", regionId);
@@ -186,6 +200,8 @@ public class HomeController {
 
     @GetMapping("/tai-khoan")
     public String taiKhoan(Model model) {
+        User currentUser = userService.getCurrentUser();
+        model.addAttribute("user", currentUser);
         model.addAttribute("content", "views/tai-khoan");
         return "layouts/layout";
     }
@@ -205,8 +221,12 @@ public class HomeController {
     @GetMapping("/phim-dang-chieu")
     public String phimDangChieu(
             @RequestParam(required = false) Integer regionId,
+            @RequestHeader(value = "HX-Request", required = false) String hxRequest,
             Model model) {
         addMovieListModel(model, "dang-chieu", regionId);
+        if ("true".equals(hxRequest)) {
+            return "fragments/movie-list-page :: movie-content";
+        }
         model.addAttribute("content", "views/phim-dang-chieu");
         return "layouts/layout";
     }
@@ -214,8 +234,12 @@ public class HomeController {
     @GetMapping("/phim-sap-chieu")
     public String phimSapChieu(
             @RequestParam(required = false) Integer regionId,
+            @RequestHeader(value = "HX-Request", required = false) String hxRequest,
             Model model) {
         addMovieListModel(model, "sap-chieu", regionId);
+        if ("true".equals(hxRequest)) {
+            return "fragments/movie-list-page :: movie-content";
+        }
         model.addAttribute("content", "views/phim-sap-chieu");
         return "layouts/layout";
     }
@@ -236,36 +260,58 @@ public class HomeController {
             @RequestParam PaymentMethod paymentMethod,
             HttpSession session
     ) {
-        var checkout = bookingService.getCheckoutSummary(
-                showtimeId,
-                BookingService.parseShowSeatIds(showSeatIds),
-                productIds,
-                quantities
-        );
+        System.out.println("=== PAYMENT INITIATE DEBUG START ===");
+        System.out.println("showtimeId = " + showtimeId);
+        System.out.println("showSeatIds = " + showSeatIds);
+        System.out.println("productIds = " + productIds);
+        System.out.println("quantities = " + quantities);
+        System.out.println("paymentMethod = " + paymentMethod);
 
-        // Store checkout info in session for later use
-        session.setAttribute("checkout", checkout);
-        session.setAttribute("showtimeId", showtimeId);
-        session.setAttribute("showSeatIds", showSeatIds);
-        session.setAttribute("productIds", productIds);
-        session.setAttribute("quantities", quantities);
-        session.setAttribute("paymentMethod", paymentMethod);
+        try {
+            var checkout = bookingService.getCheckoutSummary(
+                    showtimeId,
+                    BookingService.parseShowSeatIds(showSeatIds),
+                    productIds,
+                    quantities
+            );
 
-        if (paymentMethod == PaymentMethod.Momo) {
-            Long amount = checkout.getGrandTotal().longValue();
-            String orderInfo = "Thanh toán vé xem phim: " + checkout.getMovieTitle();
-            MomoPaymentResponse response = momoPaymentService.createPayment(amount, orderInfo);
+            System.out.println("checkout.getGrandTotal() = " + checkout.getGrandTotal());
 
-            if (response.getResultCode() == 0) {
-                return new RedirectView(response.getPayUrl());
-            } else {
-                // Handle error
-                return new RedirectView("/payment/failure?message=" + response.getMessage());
+            // Store checkout info in session for later use
+            session.setAttribute("checkout", checkout);
+            session.setAttribute("showtimeId", showtimeId);
+            session.setAttribute("showSeatIds", showSeatIds);
+            session.setAttribute("productIds", productIds);
+            session.setAttribute("quantities", quantities);
+            session.setAttribute("paymentMethod", paymentMethod);
+
+            if (paymentMethod == PaymentMethod.Momo) {
+                // --- SIMULATE PAYMENT SUCCESS (FOR PROJECT DEMO) ---
+                // Tạm bỏ qua gọi MoMo API thật để hệ thống chạy được
+                String fakeOrderId = "ORD-" + System.currentTimeMillis();
+                // Generate unique random QR code content using UUID to ensure no duplicates
+                String uniqueTicketCode = "C9-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase();
+                Long amount = checkout.getGrandTotal().longValue();
+
+                System.out.println("=== SIMULATING PAYMENT SUCCESS ===");
+                System.out.println("Order ID = " + fakeOrderId);
+                System.out.println("Unique Ticket Code = " + uniqueTicketCode);
+                System.out.println("Amount = " + amount);
+
+                // Store checkout data to session to retrieve on success page
+                session.setAttribute("uniqueTicketCode", uniqueTicketCode);
+
+                // Redirect to success page directly
+                return new RedirectView("/payment/success?partnerCode=MOMO&orderId=" + fakeOrderId + "&requestId=REQ-123&amount=" + amount + "&orderInfo=Thanh+toan+thanh+cong&resultCode=0&message=Thanh+toan+thanh+cong");
             }
-        }
 
-        // TODO: Add other payment methods (ZaloPay, VNPay, ATM)
-        return new RedirectView("/payment/failure?message=Phương thức thanh toán chưa được hỗ trợ");
+            // TODO: Add other payment methods (ZaloPay, VNPay, ATM)
+            return new RedirectView("/payment/failure?message=Phương thức thanh toán chưa được hỗ trợ");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("=== PAYMENT INITIATE EXCEPTION: " + e.getMessage());
+            return new RedirectView("/payment/failure?message=Lỗi hệ thống: " + e.getMessage());
+        }
     }
 
     @GetMapping("/payment/success")

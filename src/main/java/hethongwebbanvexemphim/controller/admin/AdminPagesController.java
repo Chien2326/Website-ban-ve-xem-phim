@@ -9,11 +9,7 @@ import hethongwebbanvexemphim.service.admin.AdminDashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/admin")
@@ -38,10 +34,14 @@ public class AdminPagesController {
     public String bookings(
             @RequestParam(required = false) BookingStatus status,
             @RequestParam(required = false) String keyword,
+            @RequestHeader(value = "HX-Request", required = false) String hxRequest,
             Model model) {
         model.addAttribute("items", adminBookingService.searchBookings(status, keyword));
         model.addAttribute("filterStatus", status);
         model.addAttribute("filterKeyword", keyword);
+        if ("true".equals(hxRequest)) {
+            return "views/admin/bookings :: bookings-table";
+        }
         return adminView(model, "views/admin/bookings");
     }
 

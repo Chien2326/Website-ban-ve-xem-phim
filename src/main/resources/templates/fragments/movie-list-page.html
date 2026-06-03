@@ -18,24 +18,42 @@
                     <li>
                         <a th:href="@{/phim-dang-chieu}" th:if="${listTab == 'dang-chieu'}"
                            class="block px-4 py-2 hover:bg-blue-50 hover:text-blue-600"
-                           th:classappend="${selectedRegionId == null} ? 'font-semibold text-blue-600' : ''">Toàn quốc</a>
+                           th:classappend="${selectedRegionId == null} ? 'font-semibold text-blue-600' : ''"
+                           hx-get="@{/phim-dang-chieu}"
+                           hx-target="#movie-content"
+                           hx-swap="innerHTML"
+                           hx-push-url="true">Toàn quốc</a>
                         <a th:href="@{/phim-sap-chieu}" th:if="${listTab == 'sap-chieu'}"
                            class="block px-4 py-2 hover:bg-blue-50 hover:text-blue-600"
-                           th:classappend="${selectedRegionId == null} ? 'font-semibold text-blue-600' : ''">Toàn quốc</a>
+                           th:classappend="${selectedRegionId == null} ? 'font-semibold text-blue-600' : ''"
+                           hx-get="@{/phim-sap-chieu}"
+                           hx-target="#movie-content"
+                           hx-swap="innerHTML"
+                           hx-push-url="true">Toàn quốc</a>
                     </li>
                     <li th:each="region : ${regions}">
                         <a th:href="@{/phim-dang-chieu(regionId=${region.regionId})}" th:if="${listTab == 'dang-chieu'}"
                            th:text="${region.regionName}"
-                           th:classappend="${region.regionId == selectedRegionId} ? 'block px-4 py-2 font-semibold text-blue-600 bg-blue-50/60' : 'block px-4 py-2 hover:bg-blue-50 hover:text-blue-600'"></a>
+                           th:classappend="${region.regionId == selectedRegionId} ? 'block px-4 py-2 font-semibold text-blue-600 bg-blue-50/60' : 'block px-4 py-2 hover:bg-blue-50 hover:text-blue-600'"
+                           hx-get="@{/phim-dang-chieu(regionId=${region.regionId})}"
+                           hx-target="#movie-content"
+                           hx-swap="innerHTML"
+                           hx-push-url="true"></a>
                         <a th:href="@{/phim-sap-chieu(regionId=${region.regionId})}" th:if="${listTab == 'sap-chieu'}"
                            th:text="${region.regionName}"
-                           th:classappend="${region.regionId == selectedRegionId} ? 'block px-4 py-2 font-semibold text-blue-600 bg-blue-50/60' : 'block px-4 py-2 hover:bg-blue-50 hover:text-blue-600'"></a>
+                           th:classappend="${region.regionId == selectedRegionId} ? 'block px-4 py-2 font-semibold text-blue-600 bg-blue-50/60' : 'block px-4 py-2 hover:bg-blue-50 hover:text-blue-600'"
+                           hx-get="@{/phim-sap-chieu(regionId=${region.regionId})}"
+                           hx-target="#movie-content"
+                           hx-swap="innerHTML"
+                           hx-push-url="true"></a>
                     </li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <div th:replace="~{fragments/movie-grid :: movieGrid(null, false)}"></div>
+    <div id="movie-content" th:fragment="movie-content">
+        <div th:replace="~{fragments/movie-grid :: movieGrid(null, false)}"></div>
+    </div>
 
 </main>

@@ -3,9 +3,9 @@
     <section class="section">
         <div class="card mb-3">
             <div class="card-body">
-                <form class="row g-2" th:action="@{/admin/bookings}" method="get">
+                <form class="row g-2" th:action="@{/admin/bookings}" method="get" hx-get="@{/admin/bookings}" hx-target="#bookings-table" hx-swap="innerHTML">
                     <div class="col-md-3">
-                        <select name="status" class="form-select form-select-sm">
+                        <select name="status" class="form-select form-select-sm" hx-get="@{/admin/bookings}" hx-target="#bookings-table" hx-swap="innerHTML" hx-include="[name='keyword']">
                             <option value="">Tất cả trạng thái</option>
                             <option th:each="s : ${T(hethongwebbanvexemphim.entity.enums.BookingStatus).values()}"
                                     th:value="${s.name()}" th:text="${s.name()}"
@@ -15,7 +15,8 @@
                     <div class="col-md-5">
                         <input type="text" name="keyword" class="form-control form-select-sm"
                                placeholder="Mã đơn, SĐT, tên khách..."
-                               th:value="${filterKeyword}">
+                               th:value="${filterKeyword}"
+                               hx-get="@{/admin/bookings}" hx-target="#bookings-table" hx-swap="innerHTML" hx-trigger="keyup changed delay:500ms" hx-include="[name='status']">
                     </div>
                     <div class="col-md-2">
                         <button type="submit" class="btn btn-primary btn-sm w-100">Lọc</button>
@@ -23,7 +24,7 @@
                 </form>
             </div>
         </div>
-        <div class="card">
+        <div class="card" id="bookings-table" th:fragment="bookings-table">
             <div class="card-body table-responsive">
                 <table class="table table-striped">
                     <thead>

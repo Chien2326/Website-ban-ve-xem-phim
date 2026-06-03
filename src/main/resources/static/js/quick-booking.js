@@ -21,11 +21,20 @@ const QuickBooking = (function () {
     let openPanel = null;
 
     function init(movieData, showtimeData) {
+        console.log('=== QuickBooking.init called ===');
+        console.log('movieData:', movieData);
+        console.log('showtimeData:', showtimeData);
+        
         movies = movieData || [];
         showtimes = showtimeData || [];
         root = document.getElementById('quick-booking');
         submitBtn = document.getElementById('qb-submit');
+        
+        console.log('root element:', root);
+        console.log('submitBtn element:', submitBtn);
+        
         if (!root || !submitBtn) {
+            console.error('Missing root or submitBtn elements!');
             return;
         }
 
@@ -128,11 +137,16 @@ const QuickBooking = (function () {
     }
 
     function renderMovies() {
+        console.log('=== renderMovies() called ===');
         const list = root.querySelector('[data-list="movie"]');
+        console.log('movie list element:', list);
         list.innerHTML = '';
 
         const movieIds = new Set(showtimes.map(function (st) { return st.movieId; }));
+        console.log('Movie IDs from showtimes:', Array.from(movieIds));
+        
         const available = movies.filter(function (m) { return movieIds.has(m.movieId); });
+        console.log('Available movies to render:', available);
 
         if (available.length === 0) {
             list.innerHTML = '<li class="px-4 py-2 text-gray-400 italic">Chưa có phim</li>';
@@ -149,6 +163,7 @@ const QuickBooking = (function () {
             });
             list.appendChild(li);
         });
+        console.log('Rendered', available.length, 'movies into list');
     }
 
     function selectMovie(movie) {
