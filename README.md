@@ -14,7 +14,8 @@
 1. Mở HeidiSQL, kết nối đến MariaDB/MySQL.
 2. Tạo database mới với tên `banvexemphim`.
 3. Chạy file `docs/banvexemphim.sql` để tạo bảng.
-4. Chạy file `docs/banvexemphim-data.sql` để thêm dữ liệu mẫu.
+4. Chạy file `docs/banvexemphim-data.sql` để thêm dữ liệu mẫu. 
+5. Hoặc chạy file `docs/file-chay-sql-banvexemphim.sql` để có CSDL có sẵn
 
 #### Bước 2: Cấu hình kết nối CSDL
 - Mở file `src/main/resources/application.properties`.
@@ -28,8 +29,8 @@
 #### Bước 3: Chạy ứng dụng
 1. Mở dự án bằng IDE.
 2. Chạy class `HeThongWebBanVeXemPhimApplication.java`.
-3. Mở trình duyệt và truy cập: `http://localhost:8080/`
-
+3. Mở trình duyệt và truy cập: `http://localhost:8080/` để xem trang chủ
+4. Mở trình duyệt và truy cập: `http://localhost:8080/admin` để xem trang admin (admin@gmail.com/ Admin@123)
 ---
 
 ## 2. Mô tả website có gì
@@ -39,7 +40,7 @@
 - **Trang chi tiết phim**: Xem thông tin chi tiết về phim (mô tả, poster, trailer, xếp hạng tuổi).
 - **Trang đặt vé**: Chọn ghế ngồi (xem sơ đồ ghế với các trạng thái: Trống, Đã chọn, Đã đặt).
 - **Trang đồ ăn**: Chọn combo bắp rang + nước uống.
-- **Trang thanh toán**: Chọn phương thức thanh toán (MoMo).
+- **Trang thanh toán**: Chọn phương thức thanh toán (Thử nghiệm thanh toán MoMo trên môi trường Sandbox)
 - **Trang xác nhận**: Xem lại tất cả thông tin đơn hàng trước khi thanh toán.
 - **Trang kết quả**: Hiển thị thông báo thành công/thất bại sau khi thanh toán.
 
