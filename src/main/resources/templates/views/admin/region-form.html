@@ -1,22 +1,51 @@
 <main id="main" class="main" th:fragment="main">
     <div th:with="pageTitle=${form.regionId != null ? 'Sửa khu vực' : 'Thêm khu vực mới'}"
          th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách khu vực', @{/admin/regions})}"></div>
+
     <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <form th:action="@{/admin/regions/save}" method="post" th:object="${form}">
-                    <input type="hidden" th:field="*{regionId}">
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label">Tên khu vực *</label>
-                            <input type="text" class="form-control" th:field="*{regionName}" required>
-                        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6">
+
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4">
+
+                        <h5 class="card-title mb-4 fw-bold text-secondary text-uppercase" style="font-size: 1rem; letter-spacing: 0.5px;">
+                            Thông tin khu vực
+                        </h5>
+
+                        <form th:action="@{/admin/regions/save}" method="post" th:object="${form}">
+                            <input type="hidden" th:field="*{regionId}">
+
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Tên khu vực <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control py-2 rounded-2"
+                                           th:field="*{regionName}"
+                                           placeholder="Nhập tên tỉnh / thành phố (Ví dụ: Hà Nội, TP. HCM...)"
+                                           pattern="^[A-Za-zÀ-žĐđ0-9 .]+$"
+                                           title="Tên khu vực chỉ được chứa chữ, số, dấu chấm và khoảng trắng"
+                                           maxlength="100"
+                                           required>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-2 d-flex align-items-center gap-2 shadow-sm">
+                                    <i class="bi bi-check-lg fs-5"></i>
+                                    <span>Lưu khu vực</span>
+                                </button>
+                                <a th:href="@{/admin/regions}" class="btn btn-light text-secondary border px-4 py-2 rounded-2 d-flex align-items-center gap-2">
+                                    <i class="bi bi-x-lg"></i>
+                                    <span>Hủy</span>
+                                </a>
+                            </div>
+                        </form>
+
                     </div>
-                    <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Lưu khu vực</button>
-                        <a th:href="@{/admin/regions}" class="btn btn-secondary">Hủy</a>
-                    </div>
-                </form>
+                </div>
+
             </div>
         </div>
     </section>

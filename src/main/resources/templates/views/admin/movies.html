@@ -1,45 +1,83 @@
 <main id="main" class="main" th:fragment="main">
     <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Danh sách phim', 'Quản lý phim', @{/admin})}"></div>
+
     <section class="section">
-        <div class="d-flex justify-content-end mb-3">
-            <a th:href="@{/admin/movies/new}" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-lg"></i> Thêm phim
-            </a>
-        </div>
-        <div class="card">
-            <div class="card-body table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead>
-                    <tr>
-                        <th>ID</th><th>Tên phim</th><th>Thời lượng</th><th>Độ tuổi</th>
-                        <th>Trạng thái</th><th>Đánh giá</th><th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="m : ${items}">
-                        <td th:text="${m.movieId}">1</td>
-                        <td th:text="${m.title}">Phim</td>
-                        <td th:text="${m.duration} + ' phút'">120</td>
-                        <td th:text="${m.rating}">T16</td>
-                        <td>
-                            <span th:if="${m.status.name() == 'NOW_SHOWING'}" class="badge bg-success" th:text="${m.status}">NOW_SHOWING</span>
-                            <span th:if="${m.status.name() == 'COMING_SOON'}" class="badge bg-info" th:text="${m.status}">COMING_SOON</span>
-                            <span th:if="${m.status.name() == 'ENDED'}" class="badge bg-secondary" th:text="${m.status}">ENDED</span>
-                        </td>
-                        <td th:text="${m.star}">8.5</td>
-                        <td class="text-nowrap">
-                            <a th:href="@{/admin/movies/{id}/edit(id=${m.movieId})}" class="btn btn-outline-primary btn-sm" title="Sửa"><i class="bi bi-pencil-square"></i></a>
-                            <form th:action="@{/admin/movies/{id}/delete(id=${m.movieId})}" method="post" class="d-inline"
-                                  onsubmit="return confirm('Xóa phim này?');">
-                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Xóa"><i class="bi bi-trash"></i></button>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(items)}">
-                        <td colspan="7" class="text-center text-muted">Chưa có phim</td>
-                    </tr>
-                    </tbody>
-                </table>
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title mb-0 fw-bold text-secondary text-uppercase" style="font-size: 1.1rem; letter-spacing: 0.5px;">
+                        Danh sách phim hiện có
+                    </h5>
+                    <a th:href="@{/admin/movies/new}" class="btn btn-primary px-3 py-2 rounded-2 d-flex align-items-center gap-2 shadow-sm">
+                        <i class="bi bi-plus-lg fs-6"></i>
+                        <span>Thêm phim mới</span>
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 datatable">
+                        <thead class="table-light text-secondary">
+                        <tr>
+                            <th class="py-3" style="width: 8%;">ID</th>
+                            <th class="py-3" style="width: 35%;">Tên phim</th>
+                            <th class="py-3" style="width: 12%;">Thời lượng</th>
+                            <th class="py-3" style="width: 10%;">Độ tuổi</th>
+                            <th class="py-3" style="width: 15%;">Trạng thái</th>
+                            <th class="py-3" style="width: 10%;">Đánh giá</th>
+                            <th class="py-3 text-end pe-4" style="width: 10%;" data-sortable="false">Chức năng</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="m : ${items}">
+                            <td class="fw-semibold text-muted" th:text="${m.movieId}">1</td>
+                            <td class="fw-bold text-dark text-truncate" style="max-width: 280px;" th:text="${m.title}">Phim</td>
+                            <td>
+                                <span class="badge bg-light text-dark border"><i class="bi bi-clock me-1 text-muted"></i> <span th:text="${m.duration} + ' phút'">120</span></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 fw-bold" th:text="${m.rating}">T16</span>
+                            </td>
+                            <td>
+                                <span th:if="${m.status.name() == 'NOW_SHOWING'}" class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" th:text="${m.status}">NOW_SHOWING</span>
+                                <span th:if="${m.status.name() == 'COMING_SOON'}" class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1" th:text="${m.status}">COMING_SOON</span>
+                                <span th:if="${m.status.name() == 'ENDED'}" class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1" th:text="${m.status}">ENDED</span>
+                            </td>
+                            <td>
+                                <span class="text-warning fw-bold"><i class="bi bi-star-fill me-1"></i></span>
+                                <span class="fw-semibold" th:text="${m.star}">8.5</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="d-inline-flex gap-2">
+                                    <a th:href="@{/admin/movies/{id}/edit(id=${m.movieId})}"
+                                       class="btn btn-sm btn-light text-primary border rounded-circle d-flex align-items-center justify-content-center"
+                                       style="width: 32px; height: 32px;"
+                                       title="Sửa">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form th:action="@{/admin/movies/{id}/delete(id=${m.movieId})}" method="post" class="d-inline"
+                                          onsubmit="return confirm('Xóa phim này?');">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-light text-danger border rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 32px; height: 32px;"
+                                                title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(items)}">
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-film display-6 d-block mb-2 text-black-50"></i>
+                                <span>Chưa có bộ phim nào trong danh sách</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </section>

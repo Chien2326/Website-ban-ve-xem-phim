@@ -23,4 +23,6 @@ public class MomoPaymentRequest {
     private String extraData;
     private String lang;
     private String signature;
+    private String orderGroupId;
+    private Boolean autoCapture;
 }

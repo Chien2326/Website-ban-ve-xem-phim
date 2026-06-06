@@ -26,9 +26,11 @@ public class MomoPaymentService {
         String orderId = UUID.randomUUID().toString();
         String requestId = UUID.randomUUID().toString();
 
-        String requestType = "captureWallet";
+        String requestType = "payWithMethod"; // Changed to payWithMethod as per example
         String extraData = ""; // Base64 encoded, empty for now
         String lang = "vi";
+        String orderGroupId = "";
+        boolean autoCapture = true;
 
         // Đảm bảo amount là số nguyên VND không có chữ thập phân
         Long momoAmount = amount;
@@ -43,8 +45,9 @@ public class MomoPaymentService {
         System.out.println("=== MOMO PAYMENT DEBUG: ipnUrl = " + momoConfig.getIpnUrl());
         System.out.println("=== MOMO PAYMENT DEBUG: partnerCode = " + momoConfig.getPartnerCode());
         System.out.println("=== MOMO PAYMENT DEBUG: accessKey = " + momoConfig.getAccessKey());
+        System.out.println("=== MOMO PAYMENT DEBUG: secretKey = " + momoConfig.getSecretKey());
 
-        // Build raw signature
+        // Build raw signature (same as example)
         String rawSignature = "accessKey=" + momoConfig.getAccessKey()
                 + "&amount=" + momoAmount
                 + "&extraData=" + extraData
@@ -61,9 +64,10 @@ public class MomoPaymentService {
         String signature = generateHmacSHA256(rawSignature, momoConfig.getSecretKey());
         System.out.println("=== MOMO PAYMENT DEBUG: signature = " + signature);
 
+        // Build request exactly like example
         MomoPaymentRequest request = MomoPaymentRequest.builder()
                 .partnerCode(momoConfig.getPartnerCode())
-                .partnerName("Test")
+                .partnerName("MoMo Payment")
                 .storeId("Test Store")
                 .requestId(requestId)
                 .amount(momoAmount)
@@ -75,6 +79,8 @@ public class MomoPaymentService {
                 .extraData(extraData)
                 .lang(lang)
                 .signature(signature)
+                .orderGroupId(orderGroupId)
+                .autoCapture(autoCapture)
                 .build();
 
         try {
@@ -87,6 +93,9 @@ public class MomoPaymentService {
                     entity,
                     MomoPaymentResponse.class
             );
+
+            System.out.println("=== MOMO PAYMENT RESPONSE ===");
+            System.out.println(response.getBody());
 
             return response.getBody();
         } catch (Exception e) {

@@ -1,4 +1,4 @@
-<main class="container my-5" th:fragment="main">
+<div class="container my-5" th:fragment="main">
     <div th:replace="~{fragments/booking-steps :: bookingSteps('payment')}"></div>
 
     <div th:if="${checkout == null}"
@@ -9,7 +9,7 @@
         <a th:href="@{/}" class="text-orange-500 font-semibold hover:underline">Về trang chủ</a>
     </div>
 
-    <main th:if="${checkout != null}"
+    <div th:if="${checkout != null}"
           th:with="posterUrl=${checkout.posterUrl != null and !#strings.isEmpty(checkout.posterUrl) ? checkout.posterUrl : defaultPoster}"
           class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -138,7 +138,7 @@
             </div>
         </div>
 
-    </main>
+    </div>
 
     <script th:if="${checkout != null}" th:src="@{/js/booking-hold-timer.js}"></script>
     <script th:if="${checkout != null}" th:inline="javascript">
@@ -180,4 +180,4 @@
             });
         });
     </script>
-</main>
+</div>

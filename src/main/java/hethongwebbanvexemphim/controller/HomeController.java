@@ -56,6 +56,7 @@ public class HomeController {
             @RequestParam(required = false) Integer regionId,
             @RequestParam(required = false) Integer cinemaId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestHeader(value = "HX-Request", required = false) String hxRequest,
             Model model) {
         List<LocalDate> scheduleDates = movieDetailService.getScheduleDates(id, regionId);
         LocalDate selectedDate = resolveScheduleDate(date, scheduleDates);
@@ -70,6 +71,12 @@ public class HomeController {
         model.addAttribute("selectedCinemaId", cinemaId);
         model.addAttribute("selectedDate", selectedDate);
         model.addAttribute("defaultPoster", MovieService.defaultPoster());
+        
+        if ("true".equals(hxRequest)) {
+            // Return only the schedule section for htmx requests
+            return "views/chi-tiet-phim :: schedule-section";
+        }
+        
         model.addAttribute("content", "views/chi-tiet-phim");
         return "layouts/layout";
     }
@@ -286,23 +293,55 @@ public class HomeController {
             session.setAttribute("paymentMethod", paymentMethod);
 
             if (paymentMethod == PaymentMethod.Momo) {
-                // --- SIMULATE PAYMENT SUCCESS (FOR PROJECT DEMO) ---
-                // Tạm bỏ qua gọi MoMo API thật để hệ thống chạy được
-                String fakeOrderId = "ORD-" + System.currentTimeMillis();
-                // Generate unique random QR code content using UUID to ensure no duplicates
-                String uniqueTicketCode = "C9-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase();
+                // Gọi API Momo thực sự để lấy link thanh toán
                 Long amount = checkout.getGrandTotal().longValue();
-
-                System.out.println("=== SIMULATING PAYMENT SUCCESS ===");
-                System.out.println("Order ID = " + fakeOrderId);
-                System.out.println("Unique Ticket Code = " + uniqueTicketCode);
+                String orderInfo = "Thanh toan ve xem phim - " + checkout.getMovieTitle();
+                
+                System.out.println("=== CALLING MOMO API ===");
                 System.out.println("Amount = " + amount);
-
-                // Store checkout data to session to retrieve on success page
-                session.setAttribute("uniqueTicketCode", uniqueTicketCode);
-
-                // Redirect to success page directly
-                return new RedirectView("/payment/success?partnerCode=MOMO&orderId=" + fakeOrderId + "&requestId=REQ-123&amount=" + amount + "&orderInfo=Thanh+toan+thanh+cong&resultCode=0&message=Thanh+toan+thanh+cong");
+                System.out.println("Order Info = " + orderInfo);
+                
+                MomoPaymentResponse momoResponse = momoPaymentService.createPayment(amount, orderInfo);
+                
+                System.out.println("=== MOMO RESPONSE ===");
+                System.out.println("Result Code = " + momoResponse.getResultCode());
+                System.out.println("Message = " + momoResponse.getMessage());
+                System.out.println("Pay URL = " + momoResponse.getPayUrl());
+                
+                if (momoResponse.getResultCode() == 0 && momoResponse.getPayUrl() != null) {
+                    // Lưu orderId và requestId vào session để dùng khi callback
+                    session.setAttribute("momoOrderId", momoResponse.getOrderId());
+                    session.setAttribute("momoRequestId", momoResponse.getRequestId());
+                    
+                    // Redirect sang trang thanh toán MoMo
+                    return new RedirectView(momoResponse.getPayUrl());
+                } else {
+                    String errorMsg = momoResponse.getMessage() != null ? momoResponse.getMessage() : "Lỗi thanh toán Momo";
+                    return new RedirectView("/payment/failure?message=" + java.net.URLEncoder.encode(errorMsg, java.nio.charset.StandardCharsets.UTF_8));
+                }
+            } else if (paymentMethod == PaymentMethod.TEST) {
+                // Phương thức thanh toán thử nghiệm: tạo đơn hàng ngay lập tức
+                try {
+                    User currentUser = userService.getCurrentUser();
+                    if (currentUser != null) {
+                        List<Integer> showSeatIdsList = BookingService.parseShowSeatIds(showSeatIds);
+                        bookingService.createBooking(
+                                showtimeId,
+                                showSeatIdsList,
+                                productIds,
+                                quantities,
+                                paymentMethod,
+                                currentUser
+                        );
+                        // Đưa checkout vào session để trang success hiện thông tin
+                        session.setAttribute("checkout", checkout);
+                    }
+                    return new RedirectView("/payment/success?resultCode=0");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("=== ERROR TEST PAYMENT: " + e.getMessage());
+                    return new RedirectView("/payment/failure?message=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+                }
             }
 
             // TODO: Add other payment methods (ZaloPay, VNPay, ATM)
@@ -329,9 +368,53 @@ public class HomeController {
             @RequestParam(required = false) Long responseTime,
             @RequestParam(required = false) String extraData,
             @RequestParam(required = false) String signature,
+            HttpSession session,
             Model model
     ) {
         if (resultCode == 0) {
+            // Lấy dữ liệu từ session
+            Object checkout = session.getAttribute("checkout");
+            Object uniqueTicketCode = session.getAttribute("uniqueTicketCode");
+            PaymentMethod paymentMethod = (PaymentMethod) session.getAttribute("paymentMethod");
+            
+            // Lưu đơn hàng vào DB CHỈ KHI NÓ LÀ PHƯƠNG THỨC MOMO (không phải TEST)
+            if (paymentMethod != PaymentMethod.TEST) {
+                try {
+                    Integer showtimeId = (Integer) session.getAttribute("showtimeId");
+                    String showSeatIdsStr = (String) session.getAttribute("showSeatIds");
+                    List<Integer> productIds = (List<Integer>) session.getAttribute("productIds");
+                    List<Integer> quantities = (List<Integer>) session.getAttribute("quantities");
+                    User currentUser = userService.getCurrentUser();
+
+                    if (showtimeId != null && showSeatIdsStr != null && currentUser != null) {
+                        List<Integer> showSeatIds = BookingService.parseShowSeatIds(showSeatIdsStr);
+                        bookingService.createBooking(
+                                showtimeId,
+                                showSeatIds,
+                                productIds,
+                                quantities,
+                                paymentMethod,
+                                currentUser
+                        );
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("=== ERROR SAVING BOOKING: " + e.getMessage());
+                }
+            }
+            
+            // Xóa session sau khi thành công
+            session.removeAttribute("checkout");
+            session.removeAttribute("showtimeId");
+            session.removeAttribute("showSeatIds");
+            session.removeAttribute("productIds");
+            session.removeAttribute("quantities");
+            session.removeAttribute("paymentMethod");
+            session.removeAttribute("uniqueTicketCode");
+
+            // Thêm dữ liệu vào Model để template có thể sử dụng
+            model.addAttribute("checkout", checkout);
+            model.addAttribute("uniqueTicketCode", uniqueTicketCode);
             model.addAttribute("message", "Thanh toán thành công!");
             model.addAttribute("orderId", orderId);
             model.addAttribute("amount", amount);
@@ -351,5 +434,34 @@ public class HomeController {
         model.addAttribute("message", message != null ? message : "Thanh toán thất bại!");
         model.addAttribute("content", "views/payment-failure");
         return "layouts/layout";
+    }
+
+    // MoMo IPN (Instant Payment Notification)
+    @PostMapping("/payment/ipn")
+    @ResponseBody
+    public String paymentIpn(
+            @RequestParam(required = false) String partnerCode,
+            @RequestParam(required = false) String orderId,
+            @RequestParam(required = false) String requestId,
+            @RequestParam(required = false) Long amount,
+            @RequestParam(required = false) String orderInfo,
+            @RequestParam(required = false) String orderType,
+            @RequestParam(required = false) Long transId,
+            @RequestParam(required = false) Integer resultCode,
+            @RequestParam(required = false) String message,
+            @RequestParam(required = false) String payType,
+            @RequestParam(required = false) Long responseTime,
+            @RequestParam(required = false) String extraData,
+            @RequestParam(required = false) String signature,
+            HttpSession session
+    ) {
+        System.out.println("=== MO MO IPN RECEIVED ===");
+        System.out.println("orderId = " + orderId);
+        System.out.println("resultCode = " + resultCode);
+        System.out.println("message = " + message);
+
+        // TODO: Verify signature, update booking status, etc.
+        // For now just log it
+        return "{\"resultCode\":0,\"message\":\"Success\"}";
     }
 }

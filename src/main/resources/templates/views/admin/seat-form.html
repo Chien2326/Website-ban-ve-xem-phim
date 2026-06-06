@@ -1,39 +1,81 @@
 <main id="main" class="main" th:fragment="main">
     <div th:with="pageTitle=${form.seatId != null ? 'Sửa ghế' : 'Thêm ghế mới'}"
          th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách phòng', @{/admin/rooms})}"></div>
+
     <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <form th:action="@{/admin/seats/save}" method="post" th:object="${form}">
-                    <input type="hidden" th:field="*{seatId}">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Phòng *</label>
-                            <select class="form-select" th:field="*{roomId}" required>
-                                <option value="">Chọn phòng</option>
-                                <option th:each="r : ${rooms}" th:value="${r.roomId}" th:text="${r.name}"></option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Hàng *</label>
-                            <input type="text" class="form-control" th:field="*{rowChar}" maxlength="1" required>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Số ghế *</label>
-                            <input type="number" class="form-control" th:field="*{seatNumber}" min="1" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Loại ghế *</label>
-                            <select class="form-select" th:field="*{seatType}" required>
-                                <option th:each="t : ${seatTypes}" th:value="${t}" th:text="${t}"></option>
-                            </select>
-                        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4">
+
+                        <h5 class="card-title mb-4 fw-bold text-secondary text-uppercase" style="font-size: 1rem; letter-spacing: 0.5px;">
+                            <i class="bi bi-grid-3x3-gap me-2 text-primary"></i>Thông tin cấu hình ghế
+                        </h5>
+
+                        <form th:action="@{/admin/seats/save}" method="post" th:object="${form}">
+                            <input type="hidden" th:field="*{seatId}">
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Thuộc phòng *
+                                    </label>
+                                    <select class="form-select py-2 rounded-2" th:field="*{roomId}" required>
+                                        <option value="">-- Chọn phòng --</option>
+                                        <option th:each="r : ${rooms}" th:value="${r.roomId}" th:text="${r.name}"></option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Hàng *
+                                    </label>
+                                    <input type="text" class="form-control py-2 rounded-2 text-center text-uppercase fw-bold"
+                                           th:field="*{rowChar}"
+                                           maxlength="1"
+                                           pattern="^[A-Za-z]$"
+                                           title="Hàng ghế chỉ được chứa một chữ cái"
+                                           placeholder="A"
+                                           required>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Số ghế *
+                                    </label>
+                                    <input type="number" class="form-control py-2 rounded-2 text-center fw-bold text-primary"
+                                           th:field="*{seatNumber}"
+                                           min="1"
+                                           placeholder="1"
+                                           required>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Loại ghế *
+                                    </label>
+                                    <select class="form-select py-2 rounded-2 fw-semibold" th:field="*{seatType}" required>
+                                        <option th:each="t : ${seatTypes}" th:value="${t}" th:text="${t}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-2 d-flex align-items-center gap-2 shadow-sm">
+                                    <i class="bi bi-check-lg fs-5"></i>
+                                    <span>Lưu thông tin</span>
+                                </button>
+                                <a th:href="@{/admin/rooms}" class="btn btn-light text-secondary border px-4 py-2 rounded-2 d-flex align-items-center gap-2">
+                                    <i class="bi bi-x-lg"></i>
+                                    <span>Hủy</span>
+                                </a>
+                            </div>
+                        </form>
+
                     </div>
-                    <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Lưu ghế</button>
-                        <a th:href="@{/admin/rooms}" class="btn btn-secondary">Hủy</a>
-                    </div>
-                </form>
+                </div>
+
             </div>
         </div>
     </section>

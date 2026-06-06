@@ -18,8 +18,8 @@ public class AdminBookingService {
     @Transactional(readOnly = true)
     public List<Booking> searchBookings(BookingStatus status, String keyword) {
         List<Booking> bookings = status == null
-                ? bookingRepository.findAllByOrderByCreatedAtDesc()
-                : bookingRepository.findByStatusOrderByCreatedAtDesc(status);
+                ? bookingRepository.findAllByOrderByBookingIdDesc()
+                : bookingRepository.findByStatusOrderByBookingIdDesc(status);
 
         if (keyword == null || keyword.isBlank()) {
             return bookings;

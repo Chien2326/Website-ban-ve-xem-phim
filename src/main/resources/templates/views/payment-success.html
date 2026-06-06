@@ -5,7 +5,7 @@
         .container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
     }
 </style>
-<main class="container my-8" th:fragment="main" th:with="checkout=${session.checkout}, uniqueCode=${session.uniqueTicketCode}">
+<main class="container my-8" th:fragment="main" th:with="checkout=${checkout}, uniqueCode=${uniqueTicketCode}">
     <div class="max-w-4xl mx-auto px-4 py-6">
 
         <!-- Header with back button -->
@@ -97,7 +97,8 @@
                         <div class="grid grid-cols-3 gap-4 text-center">
                             <div class="bg-gray-50 p-3 rounded-xl border border-gray-200">
                                 <p class="text-gray-500 text-xs mb-1">Mã vé</p>
-                                <p class="font-bold text-gray-800 text-sm break-all" th:text="${uniqueCode}">C9-ABCD1234</p>
+                                <p class="font-bold text-gray-800 text-sm break-all" 
+                                   th:text="${uniqueCode != null ? uniqueCode : (checkout != null ? 'TKT-' + checkout.showtimeId : '')}">C9-ABCD1234</p>
                             </div>
                             <div class="bg-gray-50 p-3 rounded-xl border border-gray-200">
                                 <p class="text-gray-500 text-xs mb-1">Loại vé</p>
@@ -106,8 +107,8 @@
                             <div class="bg-orange-50 p-3 rounded-xl border border-orange-200">
                                 <p class="text-gray-600 text-xs mb-1">Thanh toán</p>
                                 <p class="font-bold text-orange-500 text-lg break-all"
-                                   th:if="${amount != null}"
-                                   th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+                                   th:if="${checkout != null}"
+                                   th:text="${#numbers.formatDecimal(checkout.grandTotal, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
                                     364.000 VNĐ
                                 </p>
                             </div>

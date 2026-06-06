@@ -1,22 +1,59 @@
 <main id="main" class="main" th:fragment="main">
+    <!-- Giữ nguyên vẹn logic tạo tiêu đề động (Thêm hoặc Sửa) của bạn -->
     <div th:with="pageTitle=${form.genreId != null ? 'Sửa thể loại' : 'Thêm thể loại mới'}"
          th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách thể loại', @{/admin/genres})}"></div>
+
     <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <form th:action="@{/admin/genres/save}" method="post" th:object="${form}">
-                    <input type="hidden" th:field="*{genreId}">
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label">Tên thể loại *</label>
-                            <input type="text" class="form-control" th:field="*{genreName}" required>
-                        </div>
+        <div class="row justify-content-center">
+            <!-- Giới hạn độ rộng của Form (col-lg-6) để giao diện ôm sát, vừa mắt, không bị kéo quá dài sang hai bên -->
+            <div class="col-12 col-lg-6">
+
+                <!-- Thêm shadow-sm và loại bỏ border thô cứng cho card -->
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4">
+
+                        <!-- Tiêu đề nhỏ bên trong form để người dùng định vị thao tác -->
+                        <h5 class="card-title mb-4 fw-bold text-secondary text-uppercase" style="font-size: 1rem; letter-spacing: 0.5px;">
+                            Thông tin thể loại
+                        </h5>
+
+                        <form th:action="@{/admin/genres/save}" method="post" th:object="${form}">
+                            <!-- Giữ nguyên hidden field cho ID -->
+                            <input type="hidden" th:field="*{genreId}">
+
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <!-- Làm label chữ nhỏ, đậm và đổi màu đỏ cho dấu * bắt buộc -->
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Tên thể loại <span class="text-danger">*</span>
+                                    </label>
+                                    <!-- Input được bo góc đồng bộ, tăng padding để gõ chữ thoải mái hơn -->
+                                    <input type="text" class="form-control py-2 rounded-2"
+                                           th:field="*{genreName}"
+                                           placeholder="Nhập tên thể loại (Ví dụ: Hành động, Kinh dị...)"
+                                           pattern="^[A-Za-zÀ-žĐđ ]+$"
+                                           title="Tên thể loại chỉ được chứa chữ và khoảng trắng, không chứa số hoặc ký tự đặc biệt"
+                                           maxlength="50"
+                                           required>
+                                </div>
+                            </div>
+
+                            <!-- Khối nút hành động được căn chỉnh khoảng cách hợp lý, thêm icon trực quan -->
+                            <div class="mt-4 pt-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-2 d-flex align-items-center gap-2 shadow-sm">
+                                    <i class="bi bi-check-lg fs-5"></i>
+                                    <span>Lưu thể loại</span>
+                                </button>
+                                <a th:href="@{/admin/genres}" class="btn btn-light text-secondary border px-4 py-2 rounded-2 d-flex align-items-center gap-2">
+                                    <i class="bi bi-x-lg"></i>
+                                    <span>Hủy</span>
+                                </a>
+                            </div>
+                        </form>
+
                     </div>
-                    <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Lưu thể loại</button>
-                        <a th:href="@{/admin/genres}" class="btn btn-secondary">Hủy</a>
-                    </div>
-                </form>
+                </div>
+
             </div>
         </div>
     </section>

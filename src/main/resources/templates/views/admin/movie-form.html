@@ -1,71 +1,153 @@
 <main id="main" class="main" th:fragment="main">
     <div th:with="pageTitle=${form.movieId != null ? 'Sửa phim' : 'Thêm phim mới'}"
          th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách phim', @{/admin/movies})}"></div>
+
     <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <form th:action="@{/admin/movies/save}" method="post" th:object="${form}">
-                    <input type="hidden" th:field="*{movieId}">
-                    <div class="row g-3">
-                        <div class="col-md-8">
-                            <label class="form-label">Tên phim *</label>
-                            <input type="text" class="form-control" th:field="*{title}" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Thời lượng (phút) *</label>
-                            <input type="number" class="form-control" th:field="*{duration}" min="1" required>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Mô tả</label>
-                            <textarea class="form-control" rows="4" th:field="*{description}"></textarea>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Ngày công chiếu</label>
-                            <input type="date" class="form-control" th:field="*{releaseDate}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Trạng thái</label>
-                            <select class="form-select" th:field="*{status}">
-                                <option th:each="s : ${movieStatuses}" th:value="${s}" th:text="${s}"></option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Độ tuổi</label>
-                            <select class="form-select" th:field="*{rating}">
-                                <option value="">—</option>
-                                <option th:each="r : ${ageRatings}" th:value="${r}" th:text="${r}"></option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Poster URL</label>
-                            <input type="url" class="form-control" th:field="*{posterUrl}" placeholder="https://...">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Trailer URL</label>
-                            <input type="url" class="form-control" th:field="*{trailerUrl}" placeholder="https://youtube.com/...">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Điểm đánh giá (sao)</label>
-                            <input type="number" step="0.1" min="0" max="10" class="form-control" th:field="*{star}">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Thể loại</label>
-                            <div class="d-flex flex-wrap gap-3">
-                                <div th:each="g : ${genres}" class="form-check">
-                                    <input class="form-check-input" type="checkbox"
-                                           name="genreIds" th:value="${g.genreId}"
-                                           th:id="${'genre-' + g.genreId}"
-                                           th:checked="${form.genreIds != null and form.genreIds.contains(g.genreId)}">
-                                    <label class="form-check-label" th:for="${'genre-' + g.genreId}" th:text="${g.genreName}">Hành động</label>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4">
+
+                        <form th:action="@{/admin/movies/save}" method="post" th:object="${form}">
+                            <input type="hidden" th:field="*{movieId}">
+
+                            <!-- PHÂN KHU 1: THÔNG TIN CƠ BẢN -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-primary text-uppercase mb-3" style="font-size: 0.85rem; letter-spacing: 0.5px;">
+                                    <i class="bi bi-card-text me-2"></i>Thông tin cơ bản
+                                </h6>
+                                <hr class="text-black-50 my-2">
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-semibold text-secondary small">Tên phim <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control py-2 rounded-2" th:field="*{title}" placeholder="Nhập tên phim chính thức..."
+                                               pattern="^[A-Za-zÀ-žĐđ0-9 ,.\'()\-!?:]+$"
+                                               title="Tên phim chỉ được chứa chữ, số và các ký tự ,.'()-!?:"
+                                               maxlength="150"
+                                               required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold text-secondary small">Thời lượng (phút) <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control py-2 rounded-start-2" th:field="*{duration}" min="1" max="500" placeholder="Ví dụ: 120" required>
+                                            <span class="input-group-text bg-light text-muted small rounded-end-2">phút</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold text-secondary small">Mô tả phim</label>
+                                        <textarea class="form-control rounded-2 p-3" rows="4" th:field="*{description}" placeholder="Tóm tắt nội dung cốt truyện của phim..."></textarea>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+
+                            <!-- PHÂN KHU 2: PHÂN LOẠI & TRẠNG THÁI -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-primary text-uppercase mb-3" style="font-size: 0.85rem; letter-spacing: 0.5px;">
+                                    <i class="bi bi-sliders me-2"></i>Phân loại & Trạng thái
+                                </h6>
+                                <hr class="text-black-50 my-2">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold text-secondary small">Ngày công chiếu</label>
+                                        <input type="date" class="form-control py-2 rounded-2" th:field="*{releaseDate}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold text-secondary small">Trạng thái hoạt động</label>
+                                        <select class="form-select py-2 rounded-2" th:field="*{status}">
+                                            <option th:each="s : ${movieStatuses}" th:value="${s}" th:text="${s}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold text-secondary small">Giới hạn độ tuổi (Rating)</label>
+                                        <select class="form-select py-2 rounded-2" th:field="*{rating}">
+                                            <option value="">— Chọn độ tuổi —</option>
+                                            <option th:each="r : ${ageRatings}" th:value="${r}" th:text="${r}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PHÂN KHU 3: TRUYỀN THÔNG & ĐÁNH GIÁ (ĐÃ CẬP NHẬT NÚT TẢI TỆP) -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-primary text-uppercase mb-3" style="font-size: 0.85rem; letter-spacing: 0.5px;">
+                                    <i class="bi bi-play-btn me-2"></i>Truyền thông & Đánh giá
+                                </h6>
+                                <hr class="text-black-50 my-2">
+                                <div class="row g-3">
+
+                                    <!-- Cột Poster URL có tích hợp nút tải tệp -->
+                                    <div class="col-md-5">
+                                        <label class="form-label fw-semibold text-secondary small">Poster URL</label>
+                                        <div class="input-group">
+                                            <input type="url" class="form-control py-2 rounded-start-2" th:field="*{posterUrl}" placeholder="https://link-anh-poster.jpg">
+                                            <!-- Nút bấm giả lập tải tệp / Hoặc dùng để trigger JS mở hộp chọn file -->
+                                            <button class="btn btn-outline-secondary bg-light text-secondary border-start-0 px-3 rounded-end-2" type="button" title="Tải ảnh lên">
+                                                <i class="bi bi-image"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cột Trailer URL có tích hợp nút tải tệp -->
+                                    <div class="col-md-5">
+                                        <label class="form-label fw-semibold text-secondary small">Trailer URL</label>
+                                        <div class="input-group">
+                                            <input type="url" class="form-control py-2 rounded-start-2" th:field="*{trailerUrl}" placeholder="https://youtube.com/watch?v=...">
+                                            <!-- Nút bấm giả lập tải tệp video -->
+                                            <button class="btn btn-outline-secondary bg-light text-secondary border-start-0 px-3 rounded-end-2" type="button" title="Tải video lên">
+                                                <i class="bi bi-cloud-upload"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Điểm đánh giá (Giữ nguyên) -->
+                                    <div class="col-md-2">
+                                        <label class="form-label fw-semibold text-secondary small">Điểm đánh giá</label>
+                                        <div class="input-group">
+                                            <input type="number" step="0.1" min="0" max="10" class="form-control py-2 rounded-start-2" th:field="*{star}" placeholder="8.5">
+                                            <span class="input-group-text bg-light text-warning rounded-end-2"><i class="bi bi-star-fill"></i></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- PHÂN KHU 4: THỂ LOẠI PHIM -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-secondary text-uppercase mb-3" style="font-size: 0.85rem; letter-spacing: 0.5px;">
+                                    Thể loại phim hợp lệ
+                                </h6>
+                                <div class="p-3 bg-light rounded-3 border">
+                                    <div class="d-flex flex-wrap gap-x-4 gap-y-3">
+                                        <div th:each="g : ${genres}" class="form-check me-2">
+                                            <input class="form-check-input cursor-pointer" type="checkbox"
+                                                   name="genreIds" th:value="${g.genreId}"
+                                                   th:id="${'genre-' + g.genreId}"
+                                                   th:checked="${form.genreIds != null and form.genreIds.contains(g.genreId)}">
+                                            <label class="form-check-label text-dark fw-medium cursor-pointer"
+                                                   th:for="${'genre-' + g.genreId}"
+                                                   th:text="${g.genreName}">Hành động</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- KHỐI HÀNH ĐỘNG BUTTONS -->
+                            <div class="mt-4 pt-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-2 d-flex align-items-center gap-2 shadow-sm">
+                                    <i class="bi bi-check-lg fs-5"></i>
+                                    <span>Lưu phim</span>
+                                </button>
+                                <a th:href="@{/admin/movies}" class="btn btn-light text-secondary border px-4 py-2 rounded-2 d-flex align-items-center gap-2">
+                                    <i class="bi bi-x-lg"></i>
+                                    <span>Hủy</span>
+                                </a>
+                            </div>
+                        </form>
+
                     </div>
-                    <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Lưu phim</button>
-                        <a th:href="@{/admin/movies}" class="btn btn-secondary">Hủy</a>
-                    </div>
-                </form>
+                </div>
+
             </div>
         </div>
     </section>

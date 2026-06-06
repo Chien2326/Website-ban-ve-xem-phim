@@ -1,11 +1,11 @@
 package hethongwebbanvexemphim.config;
 
 import hethongwebbanvexemphim.security.CustomUserDetailsService;
+import hethongwebbanvexemphim.security.Sha256PasswordEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -63,7 +63,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // For testing: use plain text (DO NOT use in production!)
-        return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
+        // Use custom SHA-256 encoder to match the database
+        return new Sha256PasswordEncoder();
     }
 }

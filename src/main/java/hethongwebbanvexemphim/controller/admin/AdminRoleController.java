@@ -2,15 +2,18 @@ package hethongwebbanvexemphim.controller.admin;
 
 import hethongwebbanvexemphim.dto.admin.RoleForm;
 import hethongwebbanvexemphim.service.admin.AdminRoleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/roles")
@@ -38,7 +41,15 @@ public class AdminRoleController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute RoleForm form, Model model, RedirectAttributes redirectAttributes) {
+    public String save(@Valid @ModelAttribute RoleForm form, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errorMessage", bindingResult.getAllErrors().stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.joining(", ")));
+            model.addAttribute("form", form);
+            return adminView(model, "views/admin/role-form");
+        }
+
         try {
             adminRoleService.save(form);
             redirectAttributes.addFlashAttribute("successMessage", "Lưu vai trò thành công");

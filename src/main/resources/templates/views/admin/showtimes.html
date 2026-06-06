@@ -1,47 +1,91 @@
 <main id="main" class="main" th:fragment="main">
     <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Lịch chiếu', 'Quản lý phim', @{/admin})}"></div>
+
     <section class="section">
-        <div class="d-flex justify-content-end mb-3">
-            <a th:href="@{/admin/showtimes/new}" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-lg"></i> Thêm suất chiếu
-            </a>
-        </div>
-        <div class="card">
-            <div class="card-body table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead>
-                    <tr>
-                        <th>ID</th><th>Phim</th><th>Rạp / Phòng</th><th>Bắt đầu</th>
-                        <th>Định dạng</th><th>Giá gốc</th><th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="st : ${items}">
-                        <td th:text="${st.showtimeId}">1</td>
-                        <td th:text="${st.movie.title}">Phim</td>
-                        <td>
-                            <span th:text="${st.room.cinema.name}">Rạp</span> /
-                            <span th:text="${st.room.name}">Phòng</span>
-                        </td>
-                        <td th:text="${#temporals.format(st.startTime, 'dd/MM/yyyy HH:mm')}">—</td>
-                        <td th:text="${st.formatType}">2D</td>
-                        <td th:text="${#numbers.formatDecimal(st.priceBase, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</td>
-                        <td class="text-nowrap">
-                            <a th:href="@{/admin/showtimes/{id}/seats(id=${st.showtimeId})}"
-                               class="btn btn-outline-info btn-sm" title="Giám sát ghế"><i class="bi bi-eye"></i></a>
-                            <a th:href="@{/admin/showtimes/{id}/edit(id=${st.showtimeId})}"
-                               class="btn btn-outline-primary btn-sm" title="Sửa"><i class="bi bi-pencil-square"></i></a>
-                            <form th:action="@{/admin/showtimes/{id}/delete(id=${st.showtimeId})}" method="post" class="d-inline"
-                                  onsubmit="return confirm('Xóa suất chiếu này?');">
-                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Xóa"><i class="bi bi-trash"></i></button>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(items)}">
-                        <td colspan="7" class="text-center text-muted">Chưa có suất chiếu</td>
-                    </tr>
-                    </tbody>
-                </table>
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title mb-0 fw-bold text-secondary text-uppercase" style="font-size: 1.1rem; letter-spacing: 0.5px;">
+                        Danh sách suất chiếu
+                    </h5>
+                    <a th:href="@{/admin/showtimes/new}" class="btn btn-primary px-3 py-2 rounded-2 d-flex align-items-center gap-2 shadow-sm">
+                        <i class="bi bi-plus-lg fs-6"></i>
+                        <span>Thêm suất chiếu</span>
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 datatable">
+                        <thead class="table-light text-secondary">
+                        <tr>
+                            <th class="py-3" style="width: 8%;">ID</th>
+                            <th class="py-3" style="width: 25%;">Phim</th>
+                            <th class="py-3" style="width: 20%;">Rạp / Phòng</th>
+                            <th class="py-3" style="width: 17%;">Thời gian bắt đầu</th>
+                            <th class="py-3" style="width: 10%;">Định dạng</th>
+                            <th class="py-3" style="width: 10%;">Giá gốc</th>
+                            <th class="py-3 text-end pe-4" style="width: 10%;" data-sortable="false">Chức năng</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="st : ${items}">
+                            <td class="fw-semibold text-muted" th:text="${st.showtimeId}">1</td>
+                            <td class="fw-bold text-dark" th:text="${st.movie.title}">Phim</td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-medium text-dark" th:text="${st.room.cinema.name}">Rạp</span>
+                                    <small class="text-muted"><i class="bi bi-door-open me-1"></i><span th:text="${st.room.name}">Phòng</span></small>
+                                </div>
+                            </td>
+                            <td>
+                                    <span class="text-dark fw-medium">
+                                        <i class="bi bi-calendar3 me-1 text-muted"></i>
+                                        <span th:text="${#temporals.format(st.startTime, 'dd/MM/yyyy HH:mm')}">—</span>
+                                    </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle text-dark border border-dark-subtle px-2 py-1 fw-bold" th:text="${st.formatType}">2D</span>
+                            </td>
+                            <td>
+                                <span class="text-danger fw-bold" th:text="${#numbers.formatDecimal(st.priceBase, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="d-inline-flex gap-2">
+                                    <a th:href="@{/admin/showtimes/{id}/seats(id=${st.showtimeId})}"
+                                       class="btn btn-sm btn-light text-info border rounded-circle d-flex align-items-center justify-content-center"
+                                       style="width: 32px; height: 32px;"
+                                       title="Giám sát ghế">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a th:href="@{/admin/showtimes/{id}/edit(id=${st.showtimeId})}"
+                                       class="btn btn-sm btn-light text-primary border rounded-circle d-flex align-items-center justify-content-center"
+                                       style="width: 32px; height: 32px;"
+                                       title="Sửa">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form th:action="@{/admin/showtimes/{id}/delete(id=${st.showtimeId})}" method="post" class="d-inline"
+                                          onsubmit="return confirm('Xóa suất chiếu này?');">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-light text-danger border rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 32px; height: 32px;"
+                                                title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(items)}">
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-calendar-x display-6 d-block mb-2 text-black-50"></i>
+                                <span>Chưa có suất chiếu nào được lên lịch</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </section>

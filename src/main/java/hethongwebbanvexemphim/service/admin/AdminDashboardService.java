@@ -8,8 +8,8 @@ import hethongwebbanvexemphim.entity.enums.BookingStatus;
 import hethongwebbanvexemphim.repository.AdminStatsRepository;
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class AdminDashboardService {
     @Transactional(readOnly = true)
     public DashboardStatsDto getDashboard(String period) {
         String normalized = normalizePeriod(period);
-        Instant from = periodStart(normalized);
+        LocalDateTime from = periodStart(normalized);
 
         BigDecimal totalRevenue = adminStatsRepository.sumTotalAmountByStatus(BookingStatus.Paid);
         BigDecimal periodRevenue = adminStatsRepository.sumTotalAmountByStatusSince(BookingStatus.Paid, from);
@@ -69,14 +69,14 @@ public class AdminDashboardService {
         };
     }
 
-    private static Instant periodStart(String period) {
+    private static LocalDateTime periodStart(String period) {
         LocalDate today = LocalDate.now(ZONE);
         LocalDate start = switch (period) {
             case "day" -> today;
             case "month" -> today.withDayOfMonth(1);
             default -> today.minusDays(6);
         };
-        return start.atStartOfDay(ZONE).toInstant();
+        return start.atStartOfDay();
     }
 
     private static String periodLabel(String period) {

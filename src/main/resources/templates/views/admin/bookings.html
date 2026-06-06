@@ -1,66 +1,112 @@
 <main id="main" class="main" th:fragment="main">
     <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Danh sách đơn hàng', 'Quản lý đơn hàng', @{/admin})}"></div>
+
     <section class="section">
-        <div class="card mb-3">
-            <div class="card-body">
-                <form class="row g-2" th:action="@{/admin/bookings}" method="get" hx-get="@{/admin/bookings}" hx-target="#bookings-table" hx-swap="innerHTML">
-                    <div class="col-md-3">
-                        <select name="status" class="form-select form-select-sm" hx-get="@{/admin/bookings}" hx-target="#bookings-table" hx-swap="innerHTML" hx-include="[name='keyword']">
+        <div class="card shadow-sm border-0 rounded-3 mb-3">
+            <div class="card-body p-3">
+
+                <form class="row g-3 align-items-center" th:action="@{/admin/bookings}" method="get"
+                      hx-get="@{/admin/bookings}" hx-target="#bookings-table" hx-swap="innerHTML">
+
+                    <div class="col-12 col-md-3">
+                        <label class="form-label small fw-semibold text-secondary mb-1">Trạng thái đơn</label>
+                        <select name="status" class="form-select py-2 rounded-2 small"
+                                hx-get="@{/admin/bookings}" hx-target="#bookings-table" hx-swap="innerHTML" hx-include="[name='keyword']">
                             <option value="">Tất cả trạng thái</option>
                             <option th:each="s : ${T(hethongwebbanvexemphim.entity.enums.BookingStatus).values()}"
                                     th:value="${s.name()}" th:text="${s.name()}"
                                     th:selected="${filterStatus != null && filterStatus.name() == s.name()}"></option>
                         </select>
                     </div>
-                    <div class="col-md-5">
-                        <input type="text" name="keyword" class="form-control form-select-sm"
-                               placeholder="Mã đơn, SĐT, tên khách..."
-                               th:value="${filterKeyword}"
-                               hx-get="@{/admin/bookings}" hx-target="#bookings-table" hx-swap="innerHTML" hx-trigger="keyup changed delay:500ms" hx-include="[name='status']">
+
+                    <div class="col-12 col-md-6">
+                        <label class="form-label small fw-semibold text-secondary mb-1">Tìm kiếm thông tin</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" name="keyword" class="form-control py-2 border-start-0 rounded-end-2 small"
+                                   placeholder="Nhập mã đơn #, số điện thoại, tên khách hàng..."
+                                   th:value="${filterKeyword}"
+                                   hx-get="@{/admin/bookings}" hx-target="#bookings-table" hx-swap="innerHTML"
+                                   hx-trigger="keyup changed delay:500ms" hx-include="[name='status']">
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary btn-sm w-100">Lọc</button>
+
+                    <div class="col-12 col-md-3 align-self-end">
+                        <button type="submit" class="btn btn-primary py-2 w-100 rounded-2 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                            <i class="bi bi-funnel"></i>
+                            <span>Áp dụng lọc</span>
+                        </button>
                     </div>
                 </form>
+
             </div>
         </div>
-        <div class="card" id="bookings-table" th:fragment="bookings-table">
-            <div class="card-body table-responsive">
-                <table class="table table-striped">
-                    <thead>
+
+        <div class="card shadow-sm border-0 rounded-3" id="bookings-table" th:fragment="bookings-table"
+             hx-get="@{/admin/bookings}"
+             hx-trigger="every 10s"
+             hx-swap="outerHTML"
+             hx-include="[name='status'], [name='keyword']">
+            <div class="card-body p-4 table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-secondary">
                     <tr>
-                        <th>Mã đơn</th><th>Khách hàng</th><th>SĐT</th><th>Tổng tiền</th>
-                        <th>Thanh toán</th><th>Trạng thái</th><th>Thao tác</th>
+                        <th class="py-3" style="width: 12%;">Mã đơn</th>
+                        <th class="py-3" style="width: 20%;">Khách hàng</th>
+                        <th class="py-3" style="width: 15%;">Số điện thoại</th>
+                        <th class="py-3" style="width: 15%;">Tổng tiền</th>
+                        <th class="py-3" style="width: 13%;">Phương thức</th>
+                        <th class="py-3" style="width: 13%;">Trạng thái</th>
+                        <th class="py-3 text-end pe-4" style="width: 12%;">Hành động</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="b : ${items}">
-                        <td th:text="${'#' + b.bookingId}">#1</td>
-                        <td th:text="${b.user.fullName}">Khách</td>
-                        <td th:text="${b.user.phone}">09x</td>
-                        <td th:text="${#numbers.formatDecimal(b.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</td>
-                        <td th:text="${b.paymentMethod}">ATM</td>
                         <td>
-                            <span th:if="${b.status.name() == 'Paid'}" class="badge bg-success" th:text="${b.status}">Paid</span>
-                            <span th:if="${b.status.name() == 'Pending'}" class="badge bg-warning text-dark" th:text="${b.status}">Pending</span>
-                            <span th:if="${b.status.name() == 'Cancelled'}" class="badge bg-danger" th:text="${b.status}">Cancelled</span>
+                            <span class="badge bg-dark-subtle text-dark font-monospace px-2 py-1" th:text="${'#' + b.bookingId}">#1</span>
                         </td>
-                        <td class="text-nowrap">
-                            <form th:action="@{/admin/bookings/{id}/status(id=${b.bookingId})}" method="post" class="d-inline">
-                                <input type="hidden" name="status" value="Paid">
-                                <button type="submit" class="btn btn-outline-success btn-sm" title="Xác nhận thanh toán"><i class="bi bi-check-lg"></i></button>
-                            </form>
-                            <form th:action="@{/admin/bookings/{id}/status(id=${b.bookingId})}" method="post" class="d-inline">
-                                <input type="hidden" name="status" value="Cancelled">
-                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Hủy đơn"><i class="bi bi-x-lg"></i></button>
-                            </form>
+                        <td class="fw-bold text-dark" th:text="${b.user.fullName}">Khách</td>
+                        <td class="text-secondary fw-medium" th:text="${b.user.phone}">09x</td>
+                        <td class="fw-bold text-primary" th:text="${#numbers.formatDecimal(b.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</td>
+                        <td>
+                            <span class="small text-secondary fw-semibold"><i class="bi bi-credit-card me-1"></i>[[${b.paymentMethod}]]</span>
+                        </td>
+                        <td>
+                            <span th:if="${b.status.name() == 'Paid'}" class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5 fw-bold" th:text="${b.status}">Paid</span>
+                            <span th:if="${b.status.name() == 'Pending'}" class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1.5 fw-bold" th:text="${b.status}">Pending</span>
+                            <span th:if="${b.status.name() == 'Cancelled'}" class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1.5 fw-bold" th:text="${b.status}">Cancelled</span>
+                        </td>
+                        <td class="text-end pe-4 text-nowrap">
+                            <div class="d-inline-flex gap-2">
+                                <form th:action="@{/admin/bookings/{id}/status(id=${b.bookingId})}" method="post" class="d-inline">
+                                    <input type="hidden" name="status" value="Paid">
+                                    <button type="submit" class="btn btn-sm btn-light text-success border rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                            style="width: 32px; height: 32px;" title="Xác nhận thanh toán">
+                                        <i class="bi bi-check-lg fw-bold"></i>
+                                    </button>
+                                </form>
+
+                                <form th:action="@{/admin/bookings/{id}/status(id=${b.bookingId})}" method="post" class="d-inline">
+                                    <input type="hidden" name="status" value="Cancelled">
+                                    <button type="submit" class="btn btn-sm btn-light text-danger border rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                            style="width: 32px; height: 32px;" title="Hủy đơn"
+                                            onclick="return confirm('Bạn có chắc muốn hủy đơn hàng này?')">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(items)}">
-                        <td colspan="7" class="text-center text-muted">Không có đơn hàng</td>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-receipt-cutoff display-6 d-block mb-2 text-black-50"></i>
+                            <span>Không tìm thấy dữ liệu đơn hàng nào phù hợp</span>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
+
             </div>
         </div>
     </section>

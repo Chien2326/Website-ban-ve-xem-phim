@@ -1,58 +1,120 @@
 <main id="main" class="main" th:fragment="main" th:with="m=${monitor}">
-    <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Giám sát ghế', 'Lịch chiếu', @{/admin/showtimes})}"></div>
+    <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Giám sát trạng thái ghế', 'Lịch chiếu', @{/admin/showtimes})}"></div>
 
+    <!-- KHỐI CSS ĐƯỢC TINH CHỈNH THU GỌN DIỆN TÍCH - TẠO LAYOUT PHÒNG CHIẾU CHUẨN ĐỒ HỌA -->
     <style>
+        .admin-seat-grid .seat-wrapper {
+            display: inline-block;
+            margin: 0.2rem 0.15rem;
+            text-center: center;
+            vertical-align: top;
+        }
         .admin-seat-grid .seat-cell {
-            width: 2rem;
-            height: 2rem;
-            font-size: 0.65rem;
+            width: 2.2rem;
+            height: 2.2rem;
+            font-size: 0.7rem;
+            font-weight: 700;
             border-width: 2px;
             border-style: solid;
-            border-radius: 0.25rem;
+            border-radius: 0.35rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin: 0.125rem;
-            cursor: default;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        .admin-seat-available { background: #fff; border-color: #9ca3af; color: #374151; }
-        .admin-seat-vip { background: #fffbeb; border-color: #eab308; color: #854d0e; }
-        .admin-seat-held { background: #ffedd5; border-color: #f97316; color: #9a3412; font-weight: 600; }
-        .admin-seat-booked { background: #e5e7eb; border-color: #9ca3af; color: #6b7280; }
-        .admin-seat-screen { height: 4px; background: #f97316; border-radius: 2px; }
+        /* Phối màu dịu mát, độ tương phản cao, chuẩn UI/UX của các hệ thống CGV/Lotte */
+        .admin-seat-available { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
+        .admin-seat-vip { background: #fffbeb; border-color: #fbbf24; color: #92400e; }
+        .admin-seat-held { background: #ffedd5; border-color: #f97316; color: #ea580c; animation: pulse 2s infinite; }
+        .admin-seat-booked { background: #f1f5f9; border-color: #cbd5e1; color: #94a3b8; cursor: not-allowed; }
+
+        /* Thu nhỏ hộp chọn trạng thái để không phá vỡ kết cấu hàng ngang của sơ đồ ghế */
+        .admin-seat-grid .seat-status-select {
+            width: 2.4rem;
+            font-size: 0.55rem;
+            padding: 0.1rem 0;
+            margin-top: 0.25rem;
+            border-radius: 0.25rem;
+            height: auto;
+            border-color: #e2e8f0;
+            background-color: #f8fafc;
+        }
+        .admin-seat-grid .seat-status-select:focus {
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+
+        /* Thiết kế thanh màn hình mô phỏng dạng khối phát sáng nhẹ */
+        .admin-seat-screen {
+            height: 6px;
+            background: linear-gradient(90deg, rgba(59,130,246,0.2) 0%, rgba(59,130,246,1) 50%, rgba(59,130,246,0.2) 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
     </style>
 
     <section class="section">
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title mb-1" th:text="${m.movieTitle}">Phim</h5>
-                <p class="text-muted small mb-2">
-                    <span th:text="${m.cinemaName}">Rạp</span> ·
-                    <span th:text="${m.roomName}">Phòng</span> ·
-                    <span th:text="${#temporals.format(m.startTime, 'dd/MM/yyyy HH:mm')}">Giờ</span> ·
-                    <span th:text="${m.formatType}">2D</span>
-                </p>
-                <div class="d-flex flex-wrap gap-3 small">
-                    <span><span class="badge bg-light text-dark border">Trống</span> <strong th:text="${m.availableCount}">0</strong></span>
-                    <span><span class="badge bg-warning text-dark">Đang giữ</span> <strong th:text="${m.heldCount}">0</strong></span>
-                    <span><span class="badge bg-secondary">Đã bán</span> <strong th:text="${m.bookedCount}">0</strong></span>
+        <!-- TẤM PANEL 1: TỔNG QUAN THÔNG TIN SUẤT CHIẾU & SỐ LIỆU ĐẾM -->
+        <div class="card shadow-sm border-0 rounded-3 mb-3">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <span class="badge bg-primary-subtle text-primary fw-bold mb-2 px-2.5 py-1.5">SUẤT CHIẾU GIÁM SÁT</span>
+                        <h4 class="fw-bold text-dark mb-1" th:text="${m.movieTitle}">Tên Phim</h4>
+                        <p class="text-secondary small mb-0 d-flex flex-wrap gap-2 align-items-center">
+                            <span class="fw-semibold"><i class="bi bi-building me-1"></i>[[${m.cinemaName}]]</span>
+                            <span class="text-black-50">•</span>
+                            <span class="fw-semibold"><i class="bi bi-door-open me-1"></i>[[${m.roomName}]]</span>
+                            <span class="text-black-50">•</span>
+                            <span class="text-primary fw-bold"><i class="bi bi-clock me-1"></i>[[${#temporals.format(m.startTime, 'dd/MM/yyyy HH:mm')}]]</span>
+                            <span class="text-black-50">•</span>
+                            <span class="badge bg-light text-secondary border px-2">[[${m.formatType}]]</span>
+                        </p>
+                    </div>
+                    <!-- Khối đếm số lượng vé phân loại cực kỳ bắt mắt -->
+                    <div class="col-md-5 mt-3 mt-md-0 border-start-md ps-md-4">
+                        <div class="d-flex justify-content-md-end flex-wrap gap-2">
+                            <div class="p-2 bg-light rounded-3 text-center border" style="min-width: 80px;">
+                                <small class="text-muted d-block small fw-medium">Còn trống</small>
+                                <span class="fs-5 fw-bold text-dark" th:text="${m.availableCount}">0</span>
+                            </div>
+                            <div class="p-2 bg-warning-subtle text-warning-emphasis rounded-3 text-center border border-warning-subtle" style="min-width: 80px;">
+                                <small class="d-block small fw-medium">Đang giữ</small>
+                                <span class="fs-5 fw-bold" th:text="${m.heldCount}">0</span>
+                            </div>
+                            <div class="p-2 bg-secondary-subtle text-secondary rounded-3 text-center border border-secondary-subtle" style="min-width: 80px;">
+                                <small class="d-block small fw-medium">Đã bán</small>
+                                <span class="fs-5 fw-bold" th:text="${m.bookedCount}">0</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-body overflow-auto">
-                <div class="admin-seat-grid mx-auto" style="max-width: 720px;">
-                    <div th:each="row : ${m.seatRows}" class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted small fw-bold" style="width: 1.5rem;" th:text="${row.rowChar}">A</span>
-                        <div class="flex-grow-1 text-center">
-                            <div th:each="seat : ${row.seats}" class="d-inline-block text-center" style="vertical-align: top;">
+        <!-- TẤM PANEL 2: KHÔNG GIAN ĐỒ HỌA SƠ ĐỒ PHÒNG CHIẾU -->
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body p-4 overflow-auto">
+
+                <div class="admin-seat-grid mx-auto py-3" style="max-width: 840px; min-width: 600px;">
+                    <!-- Vòng lặp các hàng ghế -->
+                    <div th:each="row : ${m.seatRows}" class="d-flex align-items-center justify-content-between mb-1">
+                        <!-- Chữ cái đầu hàng bên trái -->
+                        <span class="text-secondary small fw-bold font-monospace text-center" style="width: 2rem;" th:text="${row.rowChar}">A</span>
+
+                        <!-- Khu vực phân tán các ô ghế -->
+                        <div class="flex-grow-1 text-center text-nowrap">
+                            <div th:each="seat : ${row.seats}" class="seat-wrapper">
+                                <!-- Ô hiển thị số ghế + Tooltip thông tin chi tiết khi trỏ chuột vào -->
                                 <span th:class="${'seat-cell ' + seat.cssClass}"
                                       th:text="${seat.seatLabel.substring(1)}"
                                       th:title="${seat.seatLabel + ' — ' + seat.statusLabel + ' — ' + #numbers.formatDecimal(seat.price, 0, 'COMMA', 0, 'POINT') + ' đ'}">1</span>
+
+                                <!-- Biểu mẫu thay đổi trạng thái nhanh tại chỗ -->
                                 <form th:action="@{/admin/showtimes/{sid}/seats/{ssid}/status(sid=${m.showtimeId}, ssid=${seat.showSeatId})}"
-                                      method="post" class="mt-1">
-                                    <select name="status" class="form-select form-select-sm" style="width: 4.5rem; font-size: 0.6rem; padding: 0.1rem;"
+                                      method="post" class="d-block m-0">
+                                    <select name="status" class="form-select form-select-sm seat-status-select mx-auto px-0 text-center"
                                             onchange="this.form.submit()">
                                         <option th:each="st : ${seatStatuses}" th:value="${st.name()}"
                                                 th:text="${st.name()}"
@@ -61,22 +123,37 @@
                                 </form>
                             </div>
                         </div>
-                        <span class="text-muted small fw-bold" style="width: 1.5rem;" th:text="${row.rowChar}">A</span>
+
+                        <!-- Chữ cái đầu hàng bên phải (Đối xứng giúp dễ nhìn khi phòng rộng) -->
+                        <span class="text-secondary small fw-bold font-monospace text-center" style="width: 2rem;" th:text="${row.rowChar}">A</span>
                     </div>
-                    <div th:if="${#lists.isEmpty(m.seatRows)}" class="text-center text-muted py-4">
-                        Chưa có ghế cho suất này. Hãy tạo lại suất chiếu hoặc kiểm tra sơ đồ phòng.
+
+                    <!-- Thông báo khi phòng trống rỗng -->
+                    <div th:if="${#lists.isEmpty(m.seatRows)}" class="text-center text-muted py-5">
+                        <i class="bi bi-grid-1x2 display-5 d-block mb-2 text-black-50"></i>
+                        <span>Chưa có dữ liệu cấu hình ghế cho suất chiếu này.</span>
                     </div>
-                    <div class="mt-6 text-center">
-                        <div class="admin-seat-screen mx-auto" style="max-width: 90%;"></div>
-                        <div class="text-muted small mt-2 tracking-widest">MÀN HÌNH</div>
+
+                    <!-- Đồ họa dải màn hình rạp chiếu hướng xuống dưới -->
+                    <div class="mt-5 pt-3 text-center">
+                        <div class="admin-seat-screen mx-auto mb-2" style="max-width: 80%;"></div>
+                        <div class="text-muted small fw-bold" style="letter-spacing: 4px; font-size: 0.75rem;">MÀN HÌNH TRÌNH CHIẾU</div>
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <div class="mt-3">
-            <a th:href="@{/admin/showtimes}" class="btn btn-secondary btn-sm">← Danh sách suất</a>
-            <a th:href="@{/admin/showtimes/{id}/edit(id=${m.showtimeId})}" class="btn btn-outline-primary btn-sm">Sửa suất</a>
+        <!-- THANH ĐIỀU HƯỚNG QUAY LẠI TẬP TRUNG CHUẨN UX -->
+        <div class="mt-4 d-flex gap-2">
+            <a th:href="@{/admin/showtimes}" class="btn btn-light text-secondary border px-3 py-2 rounded-2 d-inline-flex align-items-center gap-1.5 small shadow-sm">
+                <i class="bi bi-arrow-left"></i>
+                <span>Quay lại lịch chiếu</span>
+            </a>
+            <a th:href="@{/admin/showtimes/{id}/edit(id=${m.showtimeId})}" class="btn btn-outline-primary px-3 py-2 rounded-2 d-inline-flex align-items-center gap-1.5 small shadow-sm">
+                <i class="bi bi-pencil-square"></i>
+                <span>Chỉnh sửa cấu hình suất</span>
+            </a>
         </div>
     </section>
 </main>

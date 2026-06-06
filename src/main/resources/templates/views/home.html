@@ -1,5 +1,3 @@
-
-
 <main class="container mt-2 w-full max-w-full overflow-hidden" th:fragment="main">
     <!-- Banner Slideshow -->
     <section class="relative w-full bg-gray-100 py-0 overflow-hidden flex items-center justify-center px-4">
@@ -297,33 +295,38 @@
         });
     </script>
 
-    <main class="max-w-7xl mx-auto px-4 py-12 w-full flex-grow">
+    <div class="max-w-7xl mx-auto px-4 py-12 w-full flex-grow">
 
-        <div class="flex items-center space-x-6 border-b border-gray-200 pb-3 mb-8 text-sm font-bold text-gray-400">
-            <a th:href="@{/(tab='dang-chieu', regionId=${selectedRegionId})}"
-               th:classappend="${activeTab == 'dang-chieu'} ? 'text-gray-800 border-b-2 border-blue-600 pb-3 -mb-3' : 'cursor-pointer hover:text-gray-600 transition'"
-               class="flex items-center space-x-1.5"
-               hx-get="@{/(tab='dang-chieu', regionId=${selectedRegionId})}"
+        <div id="tabs-container" class="flex items-center space-x-6 border-b border-gray-200 pb-3 mb-8 text-sm font-bold text-gray-400">
+            <a th:href="@{/(tab='dang-chieu', regionId=${selectedRegionId})}" 
+               data-tab="dang-chieu"
+               class="tab-link flex items-center space-x-1.5"
+               th:attr="hx-get=@{/(tab='dang-chieu', regionId=${selectedRegionId})}"
                hx-target="#movie-content"
                hx-swap="innerHTML"
-               hx-push-url="true">
-                <span th:if="${activeTab == 'dang-chieu'}" class="w-1.5 h-4 bg-blue-600 rounded-sm block"></span>
+               hx-push-url="true"
+               hx-select="#movie-content">
+                <span class="tab-indicator w-1.5 h-4 bg-blue-600 rounded-sm block hidden"></span>
                 <span>Đang chiếu</span>
             </a>
-            <a th:href="@{/(tab='sap-chieu', regionId=${selectedRegionId})}"
-               th:classappend="${activeTab == 'sap-chieu'} ? 'text-gray-800 border-b-2 border-blue-600 pb-3 -mb-3' : 'cursor-pointer hover:text-gray-600 transition'"
-               hx-get="@{/(tab='sap-chieu', regionId=${selectedRegionId})}"
+            <a th:href="@{/(tab='sap-chieu', regionId=${selectedRegionId})}" 
+               data-tab="sap-chieu"
+               class="tab-link cursor-pointer hover:text-gray-600 transition"
+               th:attr="hx-get=@{/(tab='sap-chieu', regionId=${selectedRegionId})}"
                hx-target="#movie-content"
                hx-swap="innerHTML"
-               hx-push-url="true">
+               hx-push-url="true"
+               hx-select="#movie-content">
                 Sắp chiếu
             </a>
-            <a th:href="@{/(tab='imax', regionId=${selectedRegionId})}"
-               th:classappend="${activeTab == 'imax'} ? 'text-gray-800 border-b-2 border-blue-600 pb-3 -mb-3' : 'cursor-pointer hover:text-gray-600 transition'"
-               hx-get="@{/(tab='imax', regionId=${selectedRegionId})}"
+            <a th:href="@{/(tab='imax', regionId=${selectedRegionId})}" 
+               data-tab="imax"
+               class="tab-link cursor-pointer hover:text-gray-600 transition"
+               th:attr="hx-get=@{/(tab='imax', regionId=${selectedRegionId})}"
                hx-target="#movie-content"
                hx-swap="innerHTML"
-               hx-push-url="true">
+               hx-push-url="true"
+               hx-select="#movie-content">
                 Phim IMAX
             </a>
 
@@ -343,7 +346,8 @@
                                hx-get="@{/(tab=${activeTab})}"
                                hx-target="#movie-content"
                                hx-swap="innerHTML"
-                               hx-push-url="true">Toàn quốc</a>
+                               hx-push-url="true"
+                               hx-select="#movie-content">Toàn quốc</a>
                         </li>
                         <li th:each="region : ${regions}">
                             <a th:href="@{/(tab=${activeTab}, regionId=${region.regionId})}"
@@ -352,7 +356,8 @@
                                hx-get="@{/(tab=${activeTab}, regionId=${region.regionId})}"
                                hx-target="#movie-content"
                                hx-swap="innerHTML"
-                               hx-push-url="true"></a>
+                               hx-push-url="true"
+                               hx-select="#movie-content"></a>
                         </li>
                     </ul>
                 </div>
@@ -362,6 +367,42 @@
         <div id="movie-content" th:fragment="movie-content">
             <div th:replace="~{fragments/movie-grid :: movieGrid(${moreMoviesUrl}, true)}"></div>
         </div>
+        
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                const params = new URLSearchParams(window.location.search);
+                const activeTab = params.get('tab') || 'dang-chieu';
+                updateActiveTab(activeTab);
+            });
+            
+            document.body.addEventListener('htmx:afterSwap', function() {
+                const params = new URLSearchParams(window.location.search);
+                const activeTab = params.get('tab') || 'dang-chieu';
+                updateActiveTab(activeTab);
+            });
+            
+            function updateActiveTab(tabName) {
+                const links = document.querySelectorAll('.tab-link');
+                links.forEach(link => {
+                    const linkTab = link.getAttribute('data-tab');
+                    const indicator = link.querySelector('.tab-indicator');
+                    
+                    if (linkTab === tabName) {
+                        link.classList.add('text-gray-800', 'border-b-2', 'border-blue-600', 'pb-3', '-mb-3');
+                        link.classList.remove('cursor-pointer', 'hover:text-gray-600');
+                        if (indicator) {
+                            indicator.classList.remove('hidden');
+                        }
+                    } else {
+                        link.classList.remove('text-gray-800', 'border-b-2', 'border-blue-600', 'pb-3', '-mb-3');
+                        link.classList.add('cursor-pointer', 'hover:text-gray-600', 'transition');
+                        if (indicator) {
+                            indicator.classList.add('hidden');
+                        }
+                    }
+                });
+            }
+        </script>
 
-    </main>
+    </div>
 </main>

@@ -74,14 +74,14 @@ public class AuthController {
             return "views/dang-ky";
         }
 
-        // Tạo user mới (plain text for testing)
+        // Tạo user mới với mật khẩu đã mã hóa SHA-256
         User user = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .gender(request.getGender())
                 .birthday(request.getBirthday())
-                .passwordHash(request.getPassword()) // Plain text for testing
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .role(customerRoleOpt.get())
                 .build();
 

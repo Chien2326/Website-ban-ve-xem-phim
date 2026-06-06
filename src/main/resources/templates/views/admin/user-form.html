@@ -1,52 +1,128 @@
 <main id="main" class="main" th:fragment="main">
+    <!-- Giữ nguyên vẹn logic tạo tiêu đề động (Thêm hoặc Sửa) của bạn -->
     <div th:with="pageTitle=${form.userId != null ? 'Sửa người dùng' : 'Thêm người dùng mới'}"
          th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách người dùng', @{/admin/users})}"></div>
+
     <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <form th:action="@{/admin/users/save}" method="post" th:object="${form}">
-                    <input type="hidden" th:field="*{userId}">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Vai trò *</label>
-                            <select class="form-select" th:field="*{roleId}" required>
-                                <option value="">Chọn vai trò</option>
-                                <option th:each="r : ${roles}" th:value="${r.roleId}" th:text="${r.roleName}"></option>
-                            </select>
-                        </div>
-                        <div class="col-md-8">
-                            <label class="form-label">Họ tên *</label>
-                            <input type="text" class="form-control" th:field="*{fullName}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Email *</label>
-                            <input type="email" class="form-control" th:field="*{email}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Số điện thoại *</label>
-                            <input type="text" class="form-control" th:field="*{phone}" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Giới tính</label>
-                            <select class="form-select" th:field="*{gender}">
-                                <option value="">—</option>
-                                <option th:each="g : ${genders}" th:value="${g}" th:text="${g}"></option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Ngày sinh</label>
-                            <input type="date" class="form-control" th:field="*{birthday}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label" th:text="${form.userId != null ? 'Mật khẩu (để trống nếu không đổi' : 'Mật khẩu *'}">Mật khẩu *</label>
-                            <input type="password" class="form-control" th:field="*{password}" th:required="${form.userId == null}">
-                        </div>
+        <div class="row justify-content-center">
+            <!-- Sử dụng độ rộng col-lg-10 để form thông tin cá nhân hiển thị rộng rãi, cân đối -->
+            <div class="col-12 col-lg-10">
+
+                <!-- Nâng cấp hộp Card với shadow-sm hiện đại, bỏ viền thô border-0 -->
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4">
+
+                        <!-- Tiêu đề định vị không gian nhập liệu bên trong form -->
+                        <h5 class="card-title mb-4 fw-bold text-secondary text-uppercase" style="font-size: 1rem; letter-spacing: 0.5px;">
+                            Thông tin tài khoản & hồ sơ
+                        </h5>
+
+                        <form th:action="@{/admin/users/save}" method="post" th:object="${form}">
+                            <!-- Giữ nguyên hidden field cho ID người dùng -->
+                            <input type="hidden" th:field="*{userId}">
+
+                            <div class="row g-3">
+                                <!-- Nhóm 1: Vai trò (Được đẩy lên đầu tiên để xác định nhóm người dùng trước khi nhập tên) -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Vai trò <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select py-2 rounded-2" th:field="*{roleId}" required>
+                                        <option value="">-- Chọn vai trò --</option>
+                                        <!-- Giữ nguyên vòng lặp vai trò -->
+                                        <option th:each="r : ${roles}" th:value="${r.roleId}" th:text="${r.roleName}"></option>
+                                    </select>
+                                </div>
+
+                                <!-- Nhóm 1: Họ tên -->
+                                <div class="col-md-8">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Họ và tên <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control py-2 rounded-2"
+                                           th:field="*{fullName}"
+                                           placeholder="Nhập họ tên đầy đủ..."
+                                           pattern="^[A-Za-zÀ-žĐđ ]+$"
+                                           title="Họ và tên chỉ được chứa chữ và khoảng trắng"
+                                           maxlength="100"
+                                           required>
+                                </div>
+
+                                <!-- Nhóm 2: Email liên hệ -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Địa chỉ Email <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email" class="form-control py-2 rounded-2"
+                                           th:field="*{email}"
+                                           placeholder="example@mail.com"
+                                           required>
+                                </div>
+
+                                <!-- Nhóm 2: Số điện thoại -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Số điện thoại <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="tel" class="form-control py-2 rounded-2"
+                                           th:field="*{phone}"
+                                           placeholder="Nhập số điện thoại di động..."
+                                           pattern="^[0-9]{9,11}$"
+                                           title="Số điện thoại chỉ được chứa 9 đến 11 chữ số"
+                                           required>
+                                </div>
+
+                                <!-- Nhóm 3: Giới tính -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary small">Giới tính</label>
+                                    <select class="form-select py-2 rounded-2" th:field="*{gender}">
+                                        <option value="">— Chọn giới tính —</option>
+                                        <!-- Giữ nguyên vòng lặp dữ liệu giới tính -->
+                                        <option th:each="g : ${genders}" th:value="${g}" th:text="${g}"></option>
+                                    </select>
+                                </div>
+
+                                <!-- Nhóm 3: Ngày sinh -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary small">Ngày sinh</label>
+                                    <input type="date" class="form-control py-2 rounded-2" th:field="*{birthday}">
+                                </div>
+
+                                <!-- Nhóm 3: Mật khẩu bảo mật (Bọc trong input-group tạo độ chuyên nghiệp cao) -->
+                                <div class="col-md-4">
+                                    <!-- Giữ nguyên logic hiển thị text label động của bạn -->
+                                    <label class="form-label fw-semibold text-secondary small"
+                                           th:text="${form.userId != null ? 'Mật khẩu (để trống nếu không đổi)' : 'Mật khẩu *'}">
+                                        Mật khẩu *
+                                    </label>
+                                    <div class="input-group">
+                                        <!-- Giữ nguyên logic bắt buộc field (required) của bạn khi thêm mới -->
+                                        <input type="password" class="form-control py-2 rounded-2-start"
+                                               th:field="*{password}"
+                                               th:required="${form.userId == null}"
+                                               minlength="6"
+                                               placeholder="••••••••">
+                                        <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Khối nút bấm hành động chuẩn hóa thiết kế toàn hệ thống -->
+                            <div class="mt-4 pt-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-2 d-flex align-items-center gap-2 shadow-sm">
+                                    <i class="bi bi-check-lg fs-5"></i>
+                                    <span>Lưu người dùng</span>
+                                </button>
+                                <a th:href="@{/admin/users}" class="btn btn-light text-secondary border px-4 py-2 rounded-2 d-flex align-items-center gap-2">
+                                    <i class="bi bi-x-lg"></i>
+                                    <span>Hủy</span>
+                                </a>
+                            </div>
+                        </form>
+
                     </div>
-                    <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Lưu người dùng</button>
-                        <a th:href="@{/admin/users}" class="btn btn-secondary">Hủy</a>
-                    </div>
-                </form>
+                </div>
+
             </div>
         </div>
     </section>

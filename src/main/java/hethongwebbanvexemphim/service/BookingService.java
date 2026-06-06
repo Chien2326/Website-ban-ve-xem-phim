@@ -8,16 +8,25 @@ import hethongwebbanvexemphim.dto.response.SeatRowDto;
 import hethongwebbanvexemphim.dto.response.SelectedProductSummaryDto;
 import hethongwebbanvexemphim.dto.response.SelectedSeatSummaryDto;
 import hethongwebbanvexemphim.dto.response.ShowtimeDto;
+import hethongwebbanvexemphim.entity.Booking;
+import hethongwebbanvexemphim.entity.BookingProduct;
 import hethongwebbanvexemphim.entity.Product;
 import hethongwebbanvexemphim.entity.ShowSeat;
 import hethongwebbanvexemphim.entity.Showtime;
+import hethongwebbanvexemphim.entity.TicketDetail;
+import hethongwebbanvexemphim.entity.User;
 import hethongwebbanvexemphim.entity.enums.AgeRating;
+import hethongwebbanvexemphim.entity.enums.BookingStatus;
 import hethongwebbanvexemphim.entity.enums.PaymentMethod;
 import hethongwebbanvexemphim.entity.enums.ProductStatus;
 import hethongwebbanvexemphim.entity.enums.ShowSeatStatus;
+import hethongwebbanvexemphim.repository.BookingProductRepository;
+import hethongwebbanvexemphim.repository.BookingRepository;
 import hethongwebbanvexemphim.repository.ProductRepository;
 import hethongwebbanvexemphim.repository.ShowSeatRepository;
 import hethongwebbanvexemphim.repository.ShowtimeRepository;
+import hethongwebbanvexemphim.repository.TicketDetailRepository;
+import hethongwebbanvexemphim.repository.UserRepository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,6 +48,10 @@ public class BookingService {
     private final ShowtimeRepository showtimeRepository;
     private final ShowSeatRepository showSeatRepository;
     private final ProductRepository productRepository;
+    private final BookingRepository bookingRepository;
+    private final TicketDetailRepository ticketDetailRepository;
+    private final BookingProductRepository bookingProductRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public BookingPageDto getBookingPage(Integer showtimeId) {
@@ -233,6 +246,7 @@ public class BookingService {
             case ZaloPay -> "ZaloPay";
             case VNPAY -> "VNPay";
             case ATM -> "Thẻ ATM / OnePay";
+            case TEST -> "Thanh toán thử nghiệm";
         };
     }
 
@@ -295,5 +309,81 @@ public class BookingService {
             case "P", "K" -> "bg-green-600";
             default -> "bg-blue-600";
         };
+    }
+
+    @Transactional
+    public Booking createBooking(
+            Integer showtimeId,
+            List<Integer> showSeatIds,
+            List<Integer> productIds,
+            List<Integer> quantities,
+            PaymentMethod paymentMethod,
+            User user
+    ) {
+        // 1. Lấy và kiểm tra showtime
+        Showtime showtime = showtimeRepository.findDetailById(showtimeId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy suất chiếu"));
+
+        // 2. Tạo Booking
+        Booking booking = Booking.builder()
+                .user(user)
+                .totalAmount(BigDecimal.ZERO)
+                .paymentMethod(paymentMethod)
+                .status(BookingStatus.Paid)
+                .build();
+        booking = bookingRepository.save(booking);
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        // 3. Xử lý ghế: cập nhật ShowSeat và tạo TicketDetail
+        List<ShowSeat> showSeats = showSeatRepository.findAllById(showSeatIds);
+        for (ShowSeat showSeat : showSeats) {
+            // Cập nhật trạng thái ghế
+            showSeat.setStatus(ShowSeatStatus.Booked);
+            showSeatRepository.save(showSeat);
+
+            // Tạo TicketDetail
+            TicketDetail ticketDetail = TicketDetail.builder()
+                    .booking(booking)
+                    .showSeat(showSeat)
+                    .priceActual(showSeat.getPrice())
+                    .build();
+            ticketDetailRepository.save(ticketDetail);
+
+            totalAmount = totalAmount.add(showSeat.getPrice());
+        }
+
+        // 4. Xử lý sản phẩm (nếu có)
+        if (productIds != null && !productIds.isEmpty()) {
+            List<Product> products = productRepository.findAllById(productIds);
+            Map<Integer, Product> productMap = products.stream()
+                    .collect(Collectors.toMap(Product::getProductId, p -> p));
+
+            for (int i = 0; i < productIds.size(); i++) {
+                Integer productId = productIds.get(i);
+                Product product = productMap.get(productId);
+                if (product == null) continue;
+
+                int qty = (quantities != null && i < quantities.size() && quantities.get(i) > 0)
+                        ? quantities.get(i)
+                        : 1;
+
+                BookingProduct bookingProduct = BookingProduct.builder()
+                        .booking(booking)
+                        .product(product)
+                        .quantity(qty)
+                        .unitPrice(product.getPrice())
+                        .build();
+                bookingProductRepository.save(bookingProduct);
+
+                totalAmount = totalAmount.add(product.getPrice().multiply(BigDecimal.valueOf(qty)));
+            }
+        }
+
+        // 5. Cập nhật tổng tiền cho Booking
+        booking.setTotalAmount(totalAmount);
+        booking = bookingRepository.save(booking);
+
+        return booking;
     }
 }

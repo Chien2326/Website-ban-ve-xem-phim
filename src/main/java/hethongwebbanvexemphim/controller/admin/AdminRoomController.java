@@ -3,15 +3,18 @@ package hethongwebbanvexemphim.controller.admin;
 import hethongwebbanvexemphim.dto.admin.RoomForm;
 import hethongwebbanvexemphim.repository.SeatRepository;
 import hethongwebbanvexemphim.service.admin.AdminRoomService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/rooms")
@@ -41,7 +44,15 @@ public class AdminRoomController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute RoomForm form, Model model, RedirectAttributes redirectAttributes) {
+    public String save(@Valid @ModelAttribute RoomForm form, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errorMessage", bindingResult.getAllErrors().stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.joining(", ")));
+            model.addAttribute("form", form);
+            return adminView(model, "views/admin/room-form");
+        }
+
         try {
             adminRoomService.save(form);
             redirectAttributes.addFlashAttribute("successMessage", "Lưu phòng thành công");

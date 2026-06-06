@@ -1,4 +1,4 @@
-<main class="container my-5" th:fragment="main">
+<div class="container my-5" th:fragment="main">
 
     <div th:if="${checkout == null}"
          class="max-w-3xl mx-auto px-4 py-16 text-center text-gray-500">
@@ -11,13 +11,13 @@
          th:with="posterUrl=${checkout.posterUrl != null and !#strings.isEmpty(checkout.posterUrl) ? checkout.posterUrl : defaultPoster}">
         <div class="filter blur-[1px] select-none pointer-events-none">
             <div th:replace="~{fragments/booking-steps :: bookingSteps('confirm')}"></div>
-            <main class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 space-y-6">
                     <div class="bg-white rounded-lg p-6 h-40 border border-gray-200"></div>
                     <div class="bg-white rounded-lg p-6 h-96 border border-gray-200"></div>
                 </div>
                 <div class="bg-white rounded-lg p-5 border border-gray-200 h-96"></div>
-            </main>
+            </div>
         </div>
 
         <div class="fixed inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
@@ -106,16 +106,29 @@
                         <input type="checkbox" checked id="terms-checkbox" class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500 mt-1 flex-shrink-0 accent-orange-500">
                     </label>
 
-                    <form th:action="@{/payment/initiate}" method="POST" id="payment-form" class="w-full">
+                    <form th:action="@{/payment/initiate}" method="POST" id="payment-form-momo" class="w-full">
                         <input type="hidden" name="showtimeId" th:value="${checkout.showtimeId}">
                         <input type="hidden" name="showSeatIds" th:value="${showSeatIds}">
-                        <input type="hidden" name="paymentMethod" th:value="${paymentMethod}">
+                        <input type="hidden" name="paymentMethod" value="Momo">
                         <input type="hidden" th:each="pid : ${productIds}" name="productIds" th:value="${pid}">
                         <input type="hidden" th:each="qty : ${quantities}" name="quantities" th:value="${qty}">
 
-                        <button type="submit" id="payment-button"
-                                class="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg text-sm cursor-pointer tracking-wide text-center transition">
-                            Thanh Toán với <span th:text="${paymentMethodLabel}"></span>
+                        <button type="submit"
+                                class="w-full py-3 bg-[#a5156a] hover:bg-[#8c1057] text-white font-semibold rounded-lg text-sm cursor-pointer tracking-wide text-center transition">
+                            Thanh Toán với MoMo
+                        </button>
+                    </form>
+
+                    <form th:action="@{/payment/initiate}" method="POST" id="payment-form-test" class="w-full">
+                        <input type="hidden" name="showtimeId" th:value="${checkout.showtimeId}">
+                        <input type="hidden" name="showSeatIds" th:value="${showSeatIds}">
+                        <input type="hidden" name="paymentMethod" value="TEST">
+                        <input type="hidden" th:each="pid : ${productIds}" name="productIds" th:value="${pid}">
+                        <input type="hidden" th:each="qty : ${quantities}" name="quantities" th:value="${qty}">
+
+                        <button type="submit"
+                                class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg text-sm cursor-pointer tracking-wide text-center transition">
+                            Thanh Toán Thử Ngay (Thành Công)
                         </button>
                     </form>
 
@@ -128,4 +141,4 @@
             </div>
         </div>
     </div>
-</main>
+</div>

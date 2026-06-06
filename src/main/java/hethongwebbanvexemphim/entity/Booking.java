@@ -50,7 +50,7 @@ public class Booking {
     private LocalDateTime bookingTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method", columnDefinition = "ENUM('Momo', 'ZaloPay', 'VNPAY', 'ATM')")
+    @Column(name = "payment_method", columnDefinition = "ENUM('Momo', 'ZaloPay', 'VNPAY', 'ATM', 'TEST')")
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)

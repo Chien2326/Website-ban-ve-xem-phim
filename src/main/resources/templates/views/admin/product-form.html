@@ -1,46 +1,105 @@
 <main id="main" class="main" th:fragment="main">
     <div th:with="pageTitle=${form.productId != null ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới'}"
          th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách sản phẩm', @{/admin/products})}"></div>
+
     <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <form th:action="@{/admin/products/save}" method="post" th:object="${form}">
-                    <input type="hidden" th:field="*{productId}">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Tên sản phẩm *</label>
-                            <input type="text" class="form-control" th:field="*{productName}" required>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Giá *</label>
-                            <input type="number" step="0.01" class="form-control" th:field="*{price}" required>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Loại *</label>
-                            <select class="form-select" th:field="*{productType}" required>
-                                <option th:each="t : ${productTypes}" th:value="${t}" th:text="${t}"></option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Trạng thái</label>
-                            <select class="form-select" th:field="*{status}">
-                                <option th:each="s : ${productStatuses}" th:value="${s}" th:text="${s}"></option>
-                            </select>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Mô tả</label>
-                            <textarea class="form-control" rows="3" th:field="*{description}"></textarea>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">URL hình ảnh</label>
-                            <input type="url" class="form-control" th:field="*{imageUrl}">
-                        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-9">
+
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4">
+
+                        <h5 class="card-title mb-4 fw-bold text-secondary text-uppercase" style="font-size: 1rem; letter-spacing: 0.5px;">
+                            Thông tin chi tiết sản phẩm
+                        </h5>
+
+                        <form th:action="@{/admin/products/save}" method="post" th:object="${form}">
+                            <input type="hidden" th:field="*{productId}">
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-5">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Tên sản phẩm <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control py-2 rounded-2"
+                                           th:field="*{productName}"
+                                           placeholder="Ví dụ: Combo Bắp Ngọt 2 Nước..."
+                                           pattern="^[A-Za-zÀ-žĐđ0-9 ,.\-()]+$"
+                                           title="Tên sản phẩm chỉ được chứa chữ, số và ký tự ,.-()"
+                                           maxlength="100"
+                                           required>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Giá bán <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" class="form-control py-2 rounded-start-2"
+                                               th:field="*{price}"
+                                               min="0.01"
+                                               placeholder="0"
+                                               required>
+                                        <span class="input-group-text bg-light text-muted small fw-bold rounded-end-2">đ</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Loại <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select py-2 rounded-2" th:field="*{productType}" required>
+                                        <option th:each="t : ${productTypes}" th:value="${t}" th:text="${t}"></option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold text-secondary small">Trạng thái</label>
+                                    <select class="form-select py-2 rounded-2" th:field="*{status}">
+                                        <option th:each="s : ${productStatuses}" th:value="${s}" th:text="${s}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold text-secondary small">Mô tả sản phẩm</label>
+                                    <textarea class="form-control rounded-2 p-3" rows="3"
+                                              th:field="*{description}"
+                                              placeholder="Nhập chi tiết các thành phần trong sản phẩm (Ví dụ: 1 bắp lớn vị caramel + 2 coca cỡ vừa)..."></textarea>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold text-secondary small">Đường dẫn hình ảnh (URL)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-image"></i></span>
+                                        <input type="url" class="form-control py-2 border-start-0"
+                                               th:field="*{imageUrl}"
+                                               placeholder="https://link-anh-san-pham.png">
+                                        <button class="btn btn-outline-secondary bg-light text-secondary border-start-0 px-3 rounded-end-2"
+                                                type="button"
+                                                title="Tải ảnh lên">
+                                            <i class="bi bi-cloud-upload"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-2 d-flex align-items-center gap-2 shadow-sm">
+                                    <i class="bi bi-check-lg fs-5"></i>
+                                    <span>Lưu sản phẩm</span>
+                                </button>
+                                <a th:href="@{/admin/products}" class="btn btn-light text-secondary border px-4 py-2 rounded-2 d-flex align-items-center gap-2">
+                                    <i class="bi bi-x-lg"></i>
+                                    <span>Hủy</span>
+                                </a>
+                            </div>
+                        </form>
+
                     </div>
-                    <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
-                        <a th:href="@{/admin/products}" class="btn btn-secondary">Hủy</a>
-                    </div>
-                </form>
+                </div>
+
             </div>
         </div>
     </section>

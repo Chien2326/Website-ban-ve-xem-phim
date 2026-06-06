@@ -10,15 +10,96 @@
                 <img th:src="${posterUrl}"
                      th:alt="${movie.title}"
                      class="w-full h-full object-cover">
-                <a th:if="${movie.trailerUrl != null && !#strings.isEmpty(movie.trailerUrl)}"
-                   th:href="${movie.trailerUrl}"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="absolute inset-0 m-auto w-16 h-16 bg-white/90 hover:bg-white text-orange-500 rounded-full flex items-center justify-center text-2xl shadow-xl transition transform hover:scale-105 group">
+                <button th:if="${movie.trailerUrl != null && !#strings.isEmpty(movie.trailerUrl)}"
+                        id="open-trailer-btn"
+                        class="absolute inset-0 m-auto w-16 h-16 bg-white/90 hover:bg-white text-orange-500 rounded-full flex items-center justify-center text-2xl shadow-xl transition transform hover:scale-105 group">
                     <i class="fa-solid fa-play ml-1 group-hover:text-orange-600"></i>
-                </a>
+                </button>
             </div>
         </div>
+
+        <!-- Trailer Modal -->
+        <div id="trailer-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+            <div class="relative w-full max-w-4xl aspect-video">
+                <button id="close-trailer-btn" class="absolute -top-12 right-0 text-white text-3xl hover:text-gray-300 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div id="trailer-container" class="w-full h-full bg-black rounded-lg overflow-hidden">
+                    <!-- Trailer will be embedded here -->
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                const openBtn = document.getElementById('open-trailer-btn');
+                const closeBtn = document.getElementById('close-trailer-btn');
+                const modal = document.getElementById('trailer-modal');
+                const container = document.getElementById('trailer-container');
+                
+                const trailerUrl = /*[[${movie.trailerUrl}]]*/ '';
+                
+                function isIframeTag(str) {
+                    return str && str.toLowerCase().includes('<iframe');
+                }
+                
+                function getEmbedUrl(url) {
+                    if (!url) return '';
+                    // Handle YouTube URLs
+                    if (url.includes('youtube.com/watch')) {
+                        const urlParams = new URLSearchParams(new URL(url).search);
+                        const videoId = urlParams.get('v');
+                        return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                    }
+                    // Handle youtu.be short URLs
+                    if (url.includes('youtu.be/')) {
+                        const videoId = url.split('youtu.be/')[1].split('?')[0];
+                        return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                    }
+                    return url;
+                }
+                
+                function openModal() {
+                    if (isIframeTag(trailerUrl)) {
+                        // If it's already an iframe, use it directly
+                        // Add autoplay to it if possible
+                        container.innerHTML = trailerUrl.replace('</iframe>', ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>');
+                    } else {
+                        // If it's a URL, create the iframe
+                        const embedUrl = getEmbedUrl(trailerUrl);
+                        container.innerHTML = `
+                            <iframe 
+                                src="${embedUrl}"
+                                class="w-full h-full"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen>
+                            </iframe>
+                        `;
+                    }
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+                
+                function closeModal() {
+                    container.innerHTML = '';
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+                
+                if (openBtn) {
+                    openBtn.addEventListener('click', openModal);
+                }
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', closeModal);
+                }
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeModal();
+                    }
+                });
+            });
+        </script>
     </div>
 
     <div class="max-w-6xl mx-auto px-4 py-8">
@@ -71,13 +152,17 @@
                        th:text="${movie.description}">Mô tả phim</p>
                 </div>
 
-                <div class="space-y-6 pt-4">
+                <div id="schedule-section" th:fragment="schedule-section" class="space-y-6 pt-4">
                     <h3 class="text-sm font-bold text-blue-900 border-l-4 border-blue-700 pl-2 uppercase tracking-wide">Lịch Chiếu</h3>
 
                     <div class="flex flex-col sm:flex-row gap-4 border-b border-gray-100 pb-4">
                         <div class="flex flex-wrap gap-2">
                             <a th:each="scheduleDate : ${scheduleDates}"
                                th:href="@{/phim/{id}(id=${movie.movieId}, date=${scheduleDate}, regionId=${selectedRegionId}, cinemaId=${selectedCinemaId})}"
+                               hx-get="@{/phim/{id}(id=${movie.movieId}, date=${scheduleDate}, regionId=${selectedRegionId}, cinemaId=${selectedCinemaId})}"
+                               hx-target="#schedule-section"
+                               hx-swap="outerHTML"
+                               hx-push-url="true"
                                th:class="${scheduleDate.equals(selectedDate)} ? 'bg-blue-600 text-white rounded px-4 py-2 text-center shadow-sm transition' : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 rounded px-4 py-2 text-center transition'">
                                 <span th:if="${scheduleDate.equals(T(java.time.LocalDate).now())}"
                                       class="block text-xs font-bold uppercase">Hôm nay</span>
@@ -90,10 +175,18 @@
                             </a>
                         </div>
 
-                        <form class="flex gap-2 sm:ml-auto w-full sm:w-auto" method="get" th:action="@{/phim/{id}(id=${movie.movieId})}">
+                        <form class="flex gap-2 sm:ml-auto w-full sm:w-auto"
+                              hx-get="@{/phim/{id}(id=${movie.movieId})}"
+                              hx-target="#schedule-section"
+                              hx-swap="outerHTML"
+                              hx-push-url="true">
                             <input type="hidden" name="date" th:value="${selectedDate}">
                             <select name="regionId"
-                                    onchange="this.form.submit()"
+                                    hx-get="@{/phim/{id}(id=${movie.movieId})}"
+                                    hx-target="#schedule-section"
+                                    hx-swap="outerHTML"
+                                    hx-push-url="true"
+                                    hx-include="form"
                                     class="w-full sm:w-36 bg-white border border-gray-200 rounded px-3 py-1.5 text-xs font-medium text-gray-600 focus:outline-none focus:border-blue-500">
                                 <option value="" th:selected="${selectedRegionId == null}">Toàn quốc</option>
                                 <option th:each="region : ${regions}"
@@ -102,7 +195,11 @@
                                         th:selected="${region.regionId == selectedRegionId}"></option>
                             </select>
                             <select name="cinemaId"
-                                    onchange="this.form.submit()"
+                                    hx-get="@{/phim/{id}(id=${movie.movieId})}"
+                                    hx-target="#schedule-section"
+                                    hx-swap="outerHTML"
+                                    hx-push-url="true"
+                                    hx-include="form"
                                     class="w-full sm:w-36 bg-white border border-gray-200 rounded px-3 py-1.5 text-xs font-medium text-gray-600 focus:outline-none focus:border-blue-500">
                                 <option value="" th:selected="${selectedCinemaId == null}">Tất cả rạp</option>
                                 <option th:each="cinema : ${cinemas}"

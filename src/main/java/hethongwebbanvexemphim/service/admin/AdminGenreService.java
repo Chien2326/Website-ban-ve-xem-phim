@@ -56,5 +56,15 @@ public class AdminGenreService {
         if (form.getGenreName() == null || form.getGenreName().isBlank()) {
             throw new IllegalArgumentException("Tên thể loại không được để trống");
         }
+
+        String genreName = form.getGenreName().trim();
+        if (genreName.length() > 50) {
+            throw new IllegalArgumentException("Tên thể loại không được quá 50 ký tự");
+        }
+        if (!genreName.matches("^[\\p{L} ]+$")) {
+            throw new IllegalArgumentException("Tên thể loại chỉ được chứa chữ cái và khoảng trắng, không được chứa số hoặc ký tự đặc biệt");
+        }
+
+        form.setGenreName(genreName);
     }
 }

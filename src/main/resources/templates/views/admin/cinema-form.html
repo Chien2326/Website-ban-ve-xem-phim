@@ -1,33 +1,82 @@
 <main id="main" class="main" th:fragment="main">
+    <!-- Giữ nguyên vẹn logic tạo tiêu đề động (Thêm hoặc Sửa) của bạn -->
     <div th:with="pageTitle=${form.cinemaId != null ? 'Sửa rạp' : 'Thêm rạp mới'}"
          th:replace="~{fragments/admin-page-title :: adminPageTitle(${pageTitle}, 'Danh sách rạp', @{/admin/cinemas})}"></div>
+
     <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <form th:action="@{/admin/cinemas/save}" method="post" th:object="${form}">
-                    <input type="hidden" th:field="*{cinemaId}">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Khu vực *</label>
-                            <select class="form-select" th:field="*{regionId}" required>
-                                <option value="">Chọn khu vực</option>
-                                <option th:each="r : ${regions}" th:value="${r.regionId}" th:text="${r.regionName}"></option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Tên rạp *</label>
-                            <input type="text" class="form-control" th:field="*{name}" required>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Địa chỉ *</label>
-                            <textarea class="form-control" rows="3" th:field="*{address}" required></textarea>
-                        </div>
+        <div class="row justify-content-center">
+            <!-- Giới hạn độ rộng vừa phải (col-lg-8) giúp Form hiển thị cân đối và đẹp mắt trên màn hình lớn -->
+            <div class="col-12 col-lg-8">
+
+                <!-- Sử dụng card shadow nhẹ, loại bỏ border thô cứng -->
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4">
+
+                        <!-- Tiêu đề phân khu chức năng bên trong form -->
+                        <h5 class="card-title mb-4 fw-bold text-secondary text-uppercase" style="font-size: 1rem; letter-spacing: 0.5px;">
+                            Thông tin cụm rạp
+                        </h5>
+
+                        <form th:action="@{/admin/cinemas/save}" method="post" th:object="${form}">
+                            <!-- Giữ nguyên hidden field cho ID rạp -->
+                            <input type="hidden" th:field="*{cinemaId}">
+
+                            <div class="row g-3">
+                                <!-- Ô chọn khu vực (Dropdown) -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Khu vực <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select py-2 rounded-2" th:field="*{regionId}" required>
+                                        <option value="">-- Chọn khu vực --</option>
+                                        <!-- Giữ nguyên vòng lặp danh sách khu vực -->
+                                        <option th:each="r : ${regions}" th:value="${r.regionId}" th:text="${r.regionName}"></option>
+                                    </select>
+                                </div>
+
+                                <!-- Ô nhập tên rạp -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Tên rạp <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control py-2 rounded-2"
+                                           th:field="*{name}"
+                                           placeholder="Ví dụ: Galaxy Nguyễn Du, CGV Vincom..."
+                                           pattern="^[A-Za-zÀ-žĐđ0-9 .,]+$"
+                                           title="Tên rạp chỉ được chứa chữ, số, dấu chấm, dấu phẩy và khoảng trắng"
+                                           maxlength="100"
+                                           required>
+                                </div>
+
+                                <!-- Ô nhập địa chỉ chi tiết -->
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold text-secondary small">
+                                        Địa chỉ <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea class="form-control rounded-2 p-3" rows="3"
+                                              th:field="*{address}"
+                                              placeholder="Nhập địa chỉ chi tiết của cụm rạp..."
+                                              maxlength="255"
+                                              required></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Khối nút bấm hành động được làm đồng bộ, thêm icon trực quan -->
+                            <div class="mt-4 pt-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-2 d-flex align-items-center gap-2 shadow-sm">
+                                    <i class="bi bi-check-lg fs-5"></i>
+                                    <span>Lưu rạp</span>
+                                </button>
+                                <a th:href="@{/admin/cinemas}" class="btn btn-light text-secondary border px-4 py-2 rounded-2 d-flex align-items-center gap-2">
+                                    <i class="bi bi-x-lg"></i>
+                                    <span>Hủy</span>
+                                </a>
+                            </div>
+                        </form>
+
                     </div>
-                    <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Lưu rạp</button>
-                        <a th:href="@{/admin/cinemas}" class="btn btn-secondary">Hủy</a>
-                    </div>
-                </form>
+                </div>
+
             </div>
         </div>
     </section>

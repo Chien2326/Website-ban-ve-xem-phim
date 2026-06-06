@@ -1,27 +1,63 @@
 <main id="main" class="main" th:fragment="main">
-    <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Tỉnh / Thành phố', 'Quản lý rạp', @{/admin})}"></div>
+    <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Khu vực', 'Quản lý rạp', @{/admin})}"></div>
+
     <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="card-title mb-0">Danh sách khu vực</h5>
-                    <a th:href="@{/admin/regions/new}" class="btn btn-primary">Thêm khu vực</a>
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title mb-0 fw-bold text-secondary text-uppercase" style="font-size: 1.1rem; letter-spacing: 0.5px;">
+                        Danh sách khu vực
+                    </h5>
+                    <a th:href="@{/admin/regions/new}" class="btn btn-primary px-3 py-2 rounded-2 d-flex align-items-center gap-2 shadow-sm">
+                        <i class="bi bi-plus-lg fs-6"></i>
+                        <span>Thêm khu vực</span>
+                    </a>
                 </div>
-                <table class="table table-striped">
-                    <thead><tr><th>ID</th><th>Khu vực</th><th>Hành động</th></tr></thead>
-                    <tbody>
-                    <tr th:each="r : ${items}">
-                        <td th:text="${r.regionId}">1</td>
-                        <td th:text="${r.regionName}">Hà Nội</td>
-                        <td>
-                            <a th:href="@{/admin/regions/{id}/edit(id=${r.regionId})}" class="btn btn-sm btn-outline-primary" title="Sửa"><i class="bi bi-pencil-square"></i></a>
-                            <form th:action="@{/admin/regions/{id}/delete(id=${r.regionId})}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa khu vực này?')"><i class="bi bi-trash"></i></button>
-                            </form>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 datatable">
+                        <thead class="table-light text-secondary">
+                        <tr>
+                            <th class="py-3" style="width: 15%;">ID</th>
+                            <th class="py-3" style="width: 60%;">Khu vực</th>
+                            <th class="py-3 text-end pe-4" style="width: 25%;" data-sortable="false">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="r : ${items}">
+                            <td class="fw-semibold text-muted" th:text="${r.regionId}">1</td>
+                            <td class="fw-medium text-dark" th:text="${r.regionName}">Hà Nội</td>
+                            <td class="text-end pe-4">
+                                <div class="d-inline-flex gap-2">
+                                    <a th:href="@{/admin/regions/{id}/edit(id=${r.regionId})}"
+                                       class="btn btn-sm btn-light text-primary border rounded-circle d-flex align-items-center justify-content-center"
+                                       style="width: 32px; height: 32px;"
+                                       title="Sửa">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form th:action="@{/admin/regions/{id}/delete(id=${r.regionId})}" method="post" style="display:inline;">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-light text-danger border rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 32px; height: 32px;"
+                                                title="Xóa"
+                                                onclick="return confirm('Bạn có chắc muốn xóa khu vực này?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(items)}">
+                            <td colspan="3" class="text-center py-5 text-muted">
+                                <i class="bi bi-geo-alt display-6 d-block mb-2 text-black-50"></i>
+                                <span>Chưa có khu vực nào trong danh sách</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </section>

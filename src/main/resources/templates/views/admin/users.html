@@ -1,40 +1,80 @@
 <main id="main" class="main" th:fragment="main">
     <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Người dùng', 'Hệ thống', @{/admin})}"></div>
+
     <section class="section">
-        <div class="card">
-            <div class="card-body table-responsive">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="card-title mb-0">Danh sách người dùng</h5>
-                    <a th:href="@{/admin/users/new}" class="btn btn-primary">Thêm người dùng</a>
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h5 class="card-title mb-0 fw-bold text-secondary text-uppercase" style="font-size: 1.1rem; letter-spacing: 0.5px;">
+                        Danh sách người dùng
+                    </h5>
+                    <a th:href="@{/admin/users/new}" class="btn btn-primary px-3 py-2 rounded-2 d-flex align-items-center gap-2 shadow-sm">
+                        <i class="bi bi-plus-lg fs-6"></i>
+                        <span>Thêm người dùng</span>
+                    </a>
                 </div>
-                <p class="text-muted small">Khách hàng &amp; nhân viên: email, SĐT, ngày sinh (ưu đãi), vai trò.</p>
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>ID</th><th>Họ tên</th><th>Email</th><th>SĐT</th><th>Ngày sinh</th><th>Vai trò</th><th>Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="u : ${items}">
-                        <td th:text="${u.userId}">1</td>
-                        <td th:text="${u.fullName}">Nguyễn A</td>
-                        <td th:text="${u.email}">a@mail.com</td>
-                        <td th:text="${u.phone}">09x</td>
-                        <td th:text="${u.birthday != null ? #temporals.format(u.birthday, 'dd/MM/yyyy') : '—'}">—</td>
-                        <td>
-                            <span th:if="${u.role.roleName == 'ADMIN'}" class="badge bg-danger" th:text="${u.role.roleName}">ADMIN</span>
-                            <span th:if="${u.role.roleName == 'STAFF'}" class="badge bg-warning text-dark" th:text="${u.role.roleName}">STAFF</span>
-                            <span th:if="${u.role.roleName == 'CUSTOMER'}" class="badge bg-secondary" th:text="${u.role.roleName}">CUSTOMER</span>
-                        </td>
-                        <td>
-                            <a th:href="@{/admin/users/{id}/edit(id=${u.userId})}" class="btn btn-sm btn-outline-primary" title="Sửa"><i class="bi bi-pencil-square"></i></a>
-                            <form th:action="@{/admin/users/{id}/delete(id=${u.userId})}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa người dùng này?')"><i class="bi bi-trash"></i></button>
-                            </form>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 datatable">
+                        <thead class="table-light text-secondary">
+                        <tr>
+                            <th class="py-3" style="width: 7%;">ID</th>
+                            <th class="py-3" style="width: 20%;">Họ tên</th>
+                            <th class="py-3" style="width: 23%;">Email</th>
+                            <th class="py-3" style="width: 15%;">Số điện thoại</th>
+                            <th class="py-3" style="width: 12%;">Ngày sinh</th>
+                            <th class="py-3" style="width: 13%;">Vai trò</th>
+                            <th class="py-3 text-end pe-4" style="width: 10%;" data-sortable="false">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="u : ${items}">
+                            <td class="fw-semibold text-muted" th:text="${u.userId}">1</td>
+                            <td class="fw-bold text-dark" th:text="${u.fullName}">Nguyễn A</td>
+                            <td class="text-secondary" th:text="${u.email}">a@mail.com</td>
+                            <td class="text-secondary fw-medium" th:text="${u.phone}">09x</td>
+                            <td>
+                                    <span class="text-muted small">
+                                        <i class="bi bi-cake2 me-1 text-danger-subtle"></i>
+                                        <span th:text="${u.birthday != null ? #temporals.format(u.birthday, 'dd/MM/yyyy') : '—'}">—</span>
+                                    </span>
+                            </td>
+                            <td>
+                                <span th:if="${u.role.roleName == 'ADMIN'}" class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1.5 fw-bold" th:text="${u.role.roleName}">ADMIN</span>
+                                <span th:if="${u.role.roleName == 'STAFF'}" class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1.5 fw-bold" th:text="${u.role.roleName}">STAFF</span>
+                                <span th:if="${u.role.roleName == 'CUSTOMER'}" class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1.5 fw-bold" th:text="${u.role.roleName}">CUSTOMER</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="d-inline-flex gap-2">
+                                    <a th:href="@{/admin/users/{id}/edit(id=${u.userId})}"
+                                       class="btn btn-sm btn-light text-primary border rounded-circle d-flex align-items-center justify-content-center"
+                                       style="width: 32px; height: 32px;"
+                                       title="Sửa">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form th:action="@{/admin/users/{id}/delete(id=${u.userId})}" method="post" style="display:inline;">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-light text-danger border rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 32px; height: 32px;"
+                                                title="Xóa"
+                                                onclick="return confirm('Bạn có chắc muốn xóa người dùng này?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(items)}">
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-person-x display-6 d-block mb-2 text-black-50"></i>
+                                <span>Chưa có người dùng nào trong danh sách</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </section>

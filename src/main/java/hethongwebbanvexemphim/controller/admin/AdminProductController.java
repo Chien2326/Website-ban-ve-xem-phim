@@ -4,15 +4,18 @@ import hethongwebbanvexemphim.dto.admin.ProductForm;
 import hethongwebbanvexemphim.entity.enums.ProductStatus;
 import hethongwebbanvexemphim.entity.enums.ProductType;
 import hethongwebbanvexemphim.service.admin.AdminProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/products")
@@ -40,7 +43,15 @@ public class AdminProductController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute ProductForm form, Model model, RedirectAttributes redirectAttributes) {
+    public String save(@Valid @ModelAttribute ProductForm form, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errorMessage", bindingResult.getAllErrors().stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.joining(", ")));
+            prepareFormModel(model, form);
+            return adminView(model, "views/admin/product-form");
+        }
+
         try {
             adminProductService.save(form);
             redirectAttributes.addFlashAttribute("successMessage", "Lưu sản phẩm thành công");

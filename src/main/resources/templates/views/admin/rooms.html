@@ -1,67 +1,151 @@
 <main id="main" class="main" th:fragment="main">
+    <!-- Giữ nguyên vẹn fragment tiêu đề danh mục -->
     <div th:replace="~{fragments/admin-page-title :: adminPageTitle('Phòng chiếu & Sơ đồ ghế', 'Quản lý rạp', @{/admin})}"></div>
+
     <section class="section">
-        <div class="row">
+        <div class="row g-4">
+
+            <!-- BẢNG 1: PHÒNG CHIẾU (ROOMS) - CHIẾM 5/12 CỘT -->
             <div class="col-lg-5">
-                <div class="card">
-                    <div class="card-body">
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4">
+
+                        <!-- Header khối phòng chiếu -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="card-title mb-0">Phòng chiếu (Rooms)</h5>
-                            <a th:href="@{/admin/rooms/new}" class="btn btn-primary btn-sm">Thêm phòng</a>
+                            <h5 class="card-title mb-0 fw-bold text-secondary text-uppercase" style="font-size: 0.95rem; letter-spacing: 0.5px;">
+                                <i class="bi bi-door-open me-2 text-primary"></i>Phòng chiếu
+                            </h5>
+                            <a th:href="@{/admin/rooms/new}" class="btn btn-primary btn-sm px-2.5 py-1.5 rounded-2 d-flex align-items-center gap-1 shadow-sm">
+                                <i class="bi bi-plus-lg small"></i>
+                                <span class="small">Thêm phòng</span>
+                            </a>
                         </div>
-                        <table class="table table-sm table-striped">
-                            <thead><tr><th>ID</th><th>Phòng</th><th>Rạp</th><th>Tổng ghế</th><th>Hành động</th></tr></thead>
-                            <tbody>
-                            <tr th:each="r : ${items}">
-                                <td th:text="${r.roomId}">1</td>
-                                <td th:text="${r.name}">R1</td>
-                                <td th:text="${r.cinema.name}">Rạp</td>
-                                <td th:text="${r.totalSeats}">100</td>
-                                <td>
-                                    <a th:href="@{/admin/rooms/{id}/edit(id=${r.roomId})}" class="btn btn-sm btn-outline-primary" title="Sửa"><i class="bi bi-pencil-square"></i></a>
-                                    <form th:action="@{/admin/rooms/{id}/delete(id=${r.roomId})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa phòng này?')"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+
+                        <div class="table-responsive">
+                            <!-- Thêm class datatable để tìm kiếm/sắp xếp phòng nhanh -->
+                            <table class="table table-hover align-middle mb-0 datatable">
+                                <thead class="table-light text-secondary small">
+                                <tr>
+                                    <th class="py-2.5" style="width: 15%;">ID</th>
+                                    <th class="py-2.5" style="width: 25%;">Tên phòng</th>
+                                    <th class="py-2.5" style="width: 30%;">Thuộc rạp</th>
+                                    <th class="py-2.5" style="width: 15%;">Ghế</th>
+                                    <th class="py-2.5 text-end pe-3" style="width: 15%;" data-sortable="false">Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody class="small">
+                                <!-- Giữ nguyên vòng lặp danh sách phòng -->
+                                <tr th:each="r : ${items}">
+                                    <td class="fw-semibold text-muted" th:text="${r.roomId}">1</td>
+                                    <td class="fw-bold text-dark" th:text="${r.name}">R1</td>
+                                    <td class="text-secondary" th:text="${r.cinema.name}">Rạp</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border fw-medium" th:text="${r.totalSeats}">100</span>
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <div class="d-inline-flex gap-1.5">
+                                            <a th:href="@{/admin/rooms/{id}/edit(id=${r.roomId})}"
+                                               class="btn btn-sm btn-light text-primary border rounded-circle d-flex align-items-center justify-content-center"
+                                               style="width: 28px; height: 28px;" title="Sửa">
+                                                <i class="bi bi-pencil-square small"></i>
+                                            </a>
+                                            <form th:action="@{/admin/rooms/{id}/delete(id=${r.roomId})}" method="post" style="display:inline;">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-light text-danger border rounded-circle d-flex align-items-center justify-content-center"
+                                                        style="width: 28px; height: 28px;" title="Xóa"
+                                                        onclick="return confirm('Bạn có chắc muốn xóa phòng này?')">
+                                                    <i class="bi bi-trash small"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Trạng thái trống -->
+                                <tr th:if="${#lists.isEmpty(items)}">
+                                    <td colspan="5" class="text-center py-4 text-muted small">Chưa có phòng chiếu nào.</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                     </div>
                 </div>
             </div>
+
+            <!-- BẢNG 2: DANH SÁCH GHẾ (SEATS) - CHIẾM 7/12 CỘT -->
             <div class="col-lg-7">
-                <div class="card">
-                    <div class="card-body table-responsive">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="card-title mb-0">Ghế (Seats)</h5>
-                            <a th:href="@{/admin/seats/new}" class="btn btn-primary btn-sm">Thêm ghế</a>
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4">
+
+                        <!-- Header khối danh sách ghế -->
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h5 class="card-title mb-0 fw-bold text-secondary text-uppercase" style="font-size: 0.95rem; letter-spacing: 0.5px;">
+                                <i class="bi bi-grid-3x3-gap me-2 text-success"></i>Cấu hình ghế (Seats)
+                            </h5>
+                            <a th:href="@{/admin/seats/new}" class="btn btn-primary btn-sm px-2.5 py-1.5 rounded-2 d-flex align-items-center gap-1 shadow-sm">
+                                <i class="bi bi-plus-lg small"></i>
+                                <span class="small">Thêm ghế</span>
+                            </a>
                         </div>
-                        <p class="text-muted small">Hàng A,B,C... — Loại Standard / VIP / Sweetbox.</p>
-                        <table class="table table-sm table-striped">
-                            <thead><tr><th>ID</th><th>Phòng ID</th><th>Hàng</th><th>Số</th><th>Loại</th><th>Hành động</th></tr></thead>
-                            <tbody>
-                            <tr th:each="s : ${seats}">
-                                <td th:text="${s.seatId}">1</td>
-                                <td th:text="${s.room.roomId}">1</td>
-                                <td th:text="${s.rowChar}">A</td>
-                                <td th:text="${s.seatNumber}">1</td>
-                                <td>
-                                    <span th:if="${s.seatType.name() == 'Standard'}" class="badge bg-secondary" th:text="${s.seatType}">Standard</span>
-                                    <span th:if="${s.seatType.name() == 'VIP'}" class="badge bg-warning text-dark" th:text="${s.seatType}">VIP</span>
-                                    <span th:if="${s.seatType.name() == 'Sweetbox'}" class="badge bg-danger" th:text="${s.seatType}">Sweetbox</span>
-                                </td>
-                                <td>
-                                    <a th:href="@{/admin/seats/{id}/edit(id=${s.seatId})}" class="btn btn-sm btn-outline-primary" title="Sửa"><i class="bi bi-pencil-square"></i></a>
-                                    <form th:action="@{/admin/seats/{id}/delete(id=${s.seatId})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa ghế này?')"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+
+                        <div class="table-responsive">
+                            <!-- Thêm class datatable hỗ trợ tìm kiếm theo số ghế hoặc loại ghế cực tiện -->
+                            <table class="table table-hover align-middle mb-0 datatable">
+                                <thead class="table-light text-secondary small">
+                                <tr>
+                                    <th class="py-2.5" style="width: 10%;">ID</th>
+                                    <th class="py-2.5" style="width: 15%;">Mã phòng</th>
+                                    <th class="py-2.5" style="width: 15%;">Hàng</th>
+                                    <th class="py-2.5" style="width: 15%;">Số ghế</th>
+                                    <th class="py-2.5" style="width: 25%;">Loại ghế</th>
+                                    <th class="py-2.5 text-end pe-3" style="width: 20%;" data-sortable="false">Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody class="small">
+                                <!-- Giữ nguyên cấu trúc lặp dữ liệu danh sách ghế -->
+                                <tr th:each="s : ${seats}">
+                                    <td class="fw-semibold text-muted" th:text="${s.seatId}">1</td>
+                                    <td>
+                                        <span class="badge bg-dark-subtle text-dark rounded-1 font-monospace" th:text="${'P-' + s.room.roomId}">P-1</span>
+                                    </td>
+                                    <td class="fw-bold text-dark" th:text="${s.rowChar}">A</td>
+                                    <td class="fw-bold text-primary" th:text="${s.seatNumber}">1</td>
+                                    <td>
+                                        <!-- Định dạng lại Badge cấu trúc Pastel sang trọng và sắc nét -->
+                                        <span th:if="${s.seatType.name() == 'Standard'}" class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 fw-bold" th:text="${s.seatType}">Standard</span>
+                                        <span th:if="${s.seatType.name() == 'VIP'}" class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 fw-bold" th:text="${s.seatType}">VIP</span>
+                                        <span th:if="${s.seatType.name() == 'Sweetbox'}" class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 fw-bold" th:text="${s.seatType}">Sweetbox</span>
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <div class="d-inline-flex gap-1.5">
+                                            <a th:href="@{/admin/seats/{id}/edit(id=${s.seatId})}"
+                                               class="btn btn-sm btn-light text-primary border rounded-circle d-flex align-items-center justify-content-center"
+                                               style="width: 28px; height: 28px;" title="Sửa">
+                                                <i class="bi bi-pencil-square small"></i>
+                                            </a>
+                                            <form th:action="@{/admin/seats/{id}/delete(id=${s.seatId})}" method="post" style="display:inline;">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-light text-danger border rounded-circle d-flex align-items-center justify-content-center"
+                                                        style="width: 28px; height: 28px;" title="Xóa"
+                                                        onclick="return confirm('Bạn có chắc muốn xóa ghế này?')">
+                                                    <i class="bi bi-trash small"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Trạng thái trống -->
+                                <tr th:if="${#lists.isEmpty(seats)}">
+                                    <td colspan="6" class="text-center py-4 text-muted small">Chưa cấu hình dữ liệu ghế.</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                     </div>
                 </div>
             </div>
+
         </div>
     </section>
 </main>

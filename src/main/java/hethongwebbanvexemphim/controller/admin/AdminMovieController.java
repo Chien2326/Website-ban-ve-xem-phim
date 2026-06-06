@@ -2,15 +2,19 @@ package hethongwebbanvexemphim.controller.admin;
 
 import hethongwebbanvexemphim.dto.admin.MovieForm;
 import hethongwebbanvexemphim.service.admin.AdminMovieService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/movies")
@@ -38,7 +42,15 @@ public class AdminMovieController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute MovieForm form, Model model, RedirectAttributes redirectAttributes) {
+    public String save(@Valid @ModelAttribute MovieForm form, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errorMessage", bindingResult.getAllErrors().stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.joining(", ")));
+            prepareFormModel(model, form);
+            return adminView(model, "views/admin/movie-form");
+        }
+
         try {
             adminMovieService.save(form);
             redirectAttributes.addFlashAttribute("successMessage", "Lưu phim thành công");

@@ -2,15 +2,18 @@ package hethongwebbanvexemphim.controller.admin;
 
 import hethongwebbanvexemphim.dto.admin.RegionForm;
 import hethongwebbanvexemphim.service.admin.AdminRegionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/regions")
@@ -38,7 +41,15 @@ public class AdminRegionController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute RegionForm form, Model model, RedirectAttributes redirectAttributes) {
+    public String save(@Valid @ModelAttribute RegionForm form, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errorMessage", bindingResult.getAllErrors().stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.joining(", ")));
+            model.addAttribute("form", form);
+            return adminView(model, "views/admin/region-form");
+        }
+
         try {
             adminRegionService.save(form);
             redirectAttributes.addFlashAttribute("successMessage", "Lưu khu vực thành công");

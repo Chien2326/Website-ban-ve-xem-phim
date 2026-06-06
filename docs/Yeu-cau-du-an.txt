@@ -17,7 +17,6 @@
     └── Phân Quyền (Roles)
 
 
-
 1. Tổng quan & Thống kê (Dashboard):
     - Đây là trang đầu tiên admin nhìn thấy khi đăng nhập, dựa trên dữ liệu tổng hợp từ các bảng Bookings, Ticket_Details, và BookingProducts.
     - Báo cáo doanh thu: Tổng doanh thu (vé + đồ ăn), doanh thu theo ngày/tuần/tháng.Thống kê tỷ lệ đặt vé: Số lượng vé đã bán (Paid), số lượng đơn bị hủy (Cancelled), hoặc đang chờ (Pending).

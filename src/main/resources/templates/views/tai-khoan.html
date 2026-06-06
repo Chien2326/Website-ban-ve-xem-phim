@@ -76,20 +76,20 @@
 
                 <div class="border-b border-gray-200 overflow-x-auto">
                     <nav class="flex space-x-8 text-xs font-bold uppercase tracking-wider whitespace-nowrap pb-1">
-                        <button onclick="switchTab('history')" id="btn-history" class="tab-btn py-2 border-b-2 border-blue-600 text-blue-600 transition">
+                        <button data-tab="history" class="account-tab-btn py-2 border-b-2 border-blue-600 text-blue-600 transition">
                             Lịch Sử Giao Dịch
                         </button>
-                        <button onclick="switchTab('profile')" id="btn-profile" class="tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition">
+                        <button data-tab="profile" class="account-tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition">
                             Thông Tin Cá Nhân
                         </button>
-                        <button onclick="switchTab('notifications')" id="btn-notifications" class="tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition flex items-center">
+                        <button data-tab="notifications" class="account-tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition flex items-center">
                             Thông Báo
                             <span class="ml-1 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-[9px] font-bold">2</span>
                         </button>
-                        <button onclick="switchTab('gifts')" id="btn-gifts" class="tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition">
+                        <button data-tab="gifts" class="account-tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition">
                             Quà Tặng
                         </button>
-                        <button onclick="switchTab('policies')" id="btn-policies" class="tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition">
+                        <button data-tab="policies" class="account-tab-btn py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition">
                             Chính Sách
                         </button>
                     </nav>
@@ -97,7 +97,7 @@
 
                 <div class="mt-6">
 
-                    <div id="tab-history" class="tab-content space-y-4">
+                    <div data-tab-content="history" class="account-tab-content space-y-4">
                         <p class="text-center text-xs text-gray-400 italic mb-4">Lưu ý: chỉ hiển thị 20 giao dịch gần nhất</p>
                         <h4 class="text-xs text-gray-400 font-semibold uppercase tracking-wider border-b border-gray-50 pb-2">Tháng 05/2026</h4>
 
@@ -122,7 +122,7 @@
                         </div>
                     </div>
 
-                    <div id="tab-profile" class="tab-content hidden space-y-5">
+                    <div data-tab-content="profile" class="account-tab-content hidden space-y-5">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                             <div class="space-y-1.5">
                                 <label class="text-gray-500 font-medium">Họ và tên</label>
@@ -189,7 +189,7 @@
                         </div>
                     </div>
 
-                    <div id="tab-notifications" class="tab-content hidden space-y-3">
+                    <div data-tab-content="notifications" class="account-tab-content hidden space-y-3">
 
                         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-100 rounded-lg p-3.5 bg-gray-50/40 hover:shadow-sm transition text-xs gap-3">
                             <div class="flex items-start space-x-3.5">
@@ -235,11 +235,11 @@
 
                     </div>
 
-                    <div id="tab-gifts" class="tab-content hidden text-center py-10 text-xs text-gray-400">
+                    <div data-tab-content="gifts" class="account-tab-content hidden text-center py-10 text-xs text-gray-400">
                         <i class="fa-solid fa-box-open text-3xl mb-2 text-gray-300 block"></i>
                         Hiện tại không có quà tặng nào khả dụng.
                     </div>
-                    <div id="tab-policies" class="tab-content hidden text-center py-10 text-xs text-gray-400">
+                    <div data-tab-content="policies" class="account-tab-content hidden text-center py-10 text-xs text-gray-400">
                         <i class="fa-solid fa-file-shield text-3xl mb-2 text-gray-300 block"></i>
                         Các điều khoản quy chế đang được cập nhật.
                     </div>
@@ -251,22 +251,46 @@
     </div>
 </main>
 <script>
-    function switchTab(tabName) {
-        // 1. Ẩn toàn bộ nội dung của các tab đang mở
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.add('hidden');
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('=== Account tabs initialized ===');
+        
+        // Get all tab buttons
+        const tabButtons = document.querySelectorAll('.account-tab-btn');
+        console.log('Found', tabButtons.length, 'tab buttons');
+        
+        // Get all tab contents
+        const tabContents = document.querySelectorAll('.account-tab-content');
+        console.log('Found', tabContents.length, 'tab contents');
+        
+        // Add click event listener to each button
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+                console.log('Clicked tab:', targetTab);
+                
+                // Remove active state from all buttons
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('border-blue-600', 'text-blue-600');
+                    btn.classList.add('border-transparent', 'text-gray-400');
+                });
+                
+                // Add active state to clicked button
+                this.classList.remove('border-transparent', 'text-gray-400');
+                this.classList.add('border-blue-600', 'text-blue-600');
+                
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Show target tab content
+                const activeContent = document.querySelector(`[data-tab-content="${targetTab}"]`);
+                if (activeContent) {
+                    activeContent.classList.remove('hidden');
+                    console.log('Showing tab content:', targetTab);
+                }
+            });
         });
-        // 2. Trả tất cả các phím tab về màu xám mặc định
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('border-blue-600', 'text-blue-600');
-            btn.classList.add('border-transparent', 'text-gray-400');
-        });
-
-        // 3. Hiển thị nội dung của Tab vừa được nhấn chọn
-        document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-        // 4. Highlight làm nổi bật phím điều hướng của Tab hiện tại
-        const activeBtn = document.getElementById(`btn-${tabName}`);
-        activeBtn.classList.remove('border-transparent', 'text-gray-400');
-        activeBtn.classList.add('border-blue-600', 'text-blue-600');
-    }
+    });
 </script>

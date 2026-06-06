@@ -13,8 +13,8 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findByStatus(BookingStatus status);
 
     @EntityGraph(attributePaths = "user")
-    List<Booking> findAllByOrderByCreatedAtDesc();
+    List<Booking> findAllByOrderByBookingIdDesc();
 
     @EntityGraph(attributePaths = "user")
-    List<Booking> findByStatusOrderByCreatedAtDesc(BookingStatus status);
+    List<Booking> findByStatusOrderByBookingIdDesc(BookingStatus status);
 }
